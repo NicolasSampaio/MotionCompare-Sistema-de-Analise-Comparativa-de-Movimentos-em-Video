@@ -1,61 +1,100 @@
 # Sistema de Análise Comparativa de Movimentos de Dança
 
-Este projeto implementa um sistema de detecção de pose em tempo real utilizando a biblioteca MediaPipe e OpenCV. O sistema captura vídeo da webcam e identifica os pontos-chave do corpo humano, desenhando-os na tela.
+Este projeto é um sistema de software desenvolvido como Trabalho de Conclusão de Curso (TCC) em Sistemas de Informação, capaz de receber dois arquivos de vídeo e realizar uma análise comparativa para determinar se os sujeitos nos vídeos executaram os mesmos movimentos de dança.
 
-## 🚀 Funcionalidades
+## Requisitos do Sistema
 
-- Detecção de pose em tempo real
-- Visualização dos pontos-chave do corpo
-- Interface gráfica com visualização em espelho
-- Redimensionamento automático da janela para melhor visualização
+- Python 3.8 ou superior
+- Node.js 18 LTS ou superior
+- npm 9 ou superior
+- Git
 
-## 📋 Pré-requisitos
+## Estrutura do Projeto
 
-- Python 3.7 ou superior
-- Webcam funcional
-- Bibliotecas Python definidas em `requirements.txt`
-
-## 🔧 Instalação
-
-1. Clone este repositório:
-
-```bash
-git clone https://github.com/NicolasSampaio/Sistema-de-Analise-Comparativa-de-Movimentos-de-Danca
+```
+/
+├── app-ui/           # Aplicação Frontend (Electron + Angular)
+├── core-logic/       # Lógica principal em Python
+├── results-output/   # Diretório para resultados
+├── scripts/          # Scripts auxiliares
+└── docs/            # Documentação do projeto
 ```
 
-2. Instale as dependências:
+## Instalação
+
+1. Clone o repositório:
+
+```bash
+git clone [URL_DO_REPOSITÓRIO]
+cd dance-comparison-app
+```
+
+2. Instale as dependências Python:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🎮 Como Usar
-
-1. Execute o script principal:
+3. Instale as dependências Node.js:
 
 ```bash
-python main.py
+cd app-ui
+npm install
 ```
 
-2. Controles:
-   - Pressione 'q' para sair do programa
+## Desenvolvimento
 
-## 🛠️ Tecnologias Utilizadas
+### Backend (Python)
 
-- [MediaPipe](https://pypi.org/project/mediapipe/) - Framework para detecção de pose
-- [OpenCV](https://opencv.org/) - Processamento de imagem e vídeo
-- [NumPy](https://numpy.org/) - Computação numérica
+Para executar os testes do backend:
 
-## 📝 Notas
+```bash
+pytest
+```
 
-- O programa requer uma webcam funcional
-- A detecção funciona melhor com boa iluminação
-- A performance pode variar dependendo do hardware do computador
+### Frontend (Angular + Electron)
 
-## 🤝 Contribuindo
+Para iniciar o ambiente de desenvolvimento:
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests.
+```bash
+cd app-ui
+npm start        # Inicia o servidor Angular
+npm run electron:start  # Inicia o Electron
+```
 
-## 📄 Licença
+Para build do projeto:
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+```bash
+cd app-ui
+npm run build
+npm run electron:build
+```
+
+## Scripts Disponíveis
+
+- `npm start`: Inicia o servidor de desenvolvimento Angular
+- `npm run electron:start`: Inicia a aplicação Electron
+- `npm run build`: Compila o projeto Angular
+- `npm run electron:build`: Cria o executável da aplicação
+- `npm test`: Executa os testes do frontend
+- `pytest`: Executa os testes do backend
+
+## Documentação
+
+A documentação completa do projeto está disponível no diretório `docs/`:
+
+- `docs/product-requirements.md`: Requisitos do produto
+- `docs/tasks/`: Histórias de usuário e tarefas
+- `docs/checklists/`: Checklists de desenvolvimento
+- `docs/templates/`: Templates de documentação
+
+## Contribuição
+
+1. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+2. Faça commit das suas alterações (`git commit -m 'feat: adiciona nova feature'`)
+3. Faça push para a branch (`git push origin feature/nova-feature`)
+4. Abra um Pull Request
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
