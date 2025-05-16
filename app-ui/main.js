@@ -26,66 +26,51 @@ function createWindow() {
 
 function startPythonProcess() {
   // Inicia o processo Python
-  pythonProcess = spawn("python", ["core-logic/main_core.py"], {
+  pythonProcess = spawn("python", ["../main_core.py"], {
     stdio: ["pipe", "pipe", "pipe"],
   });
 
-  pythonProcess.stdout.on("data", (data) => {
-    console.log(`Python stdout: ${data}`);
-  });
-
+  // Manipula erros do processo Python
   pythonProcess.stderr.on("data", (data) => {
-    console.error(`Python stderr: ${data}`);
+    console.error(`Erro do Python: ${data}`);
   });
 
-  pythonProcess.on("close", (code) => {
-    console.log(`Python process exited with code ${code}`);
+  // Manipula a saída do processo Python
+  pythonProcess.stdout.on("data", (data) => {
+    try {
+      const response = JSON.parse(data.toString());
+      mainWindow.webContents.send("python-response", response);
+    } catch (error) {
+      console.error("Erro ao processar resposta do Python:", error);
+    }
   });
 }
 
-// Configuração do IPC para comunicação com Python
-ipcMain.handle("python-request", async (event, requestData) => {
-  return new Promise((resolve, reject) => {
-    if (!pythonProcess) {
-      reject(new Error("Python process not started"));
-      return;
-    }
-
-    // Envia a requisição para o processo Python
-    pythonProcess.stdin.write(JSON.stringify(requestData) + "\n", (err) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      // Lê a resposta do Python
-      pythonProcess.stdout.once("data", (data) => {
-        try {
-          const response = JSON.parse(data.toString());
-          resolve(response);
-        } catch (error) {
-          reject(error);
-        }
-      });
-    });
-  });
-});
-
+// Inicia a aplicação quando o Electron estiver pronto
 app.whenReady().then(() => {
   createWindow();
   startPythonProcess();
 
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
   });
 });
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") app.quit();
+// Encerra a aplicação quando todas as janelas forem fechadas
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    if (pythonProcess) {
+      pythonProcess.kill();
+    }
+    app.quit();
+  }
 });
 
-app.on("before-quit", () => {
-  if (pythonProcess) {
-    pythonProcess.kill();
+// Manipula mensagens do renderer process
+ipcMain.on("process-frame", (event, frameData) => {
+  if (pythonProcess && pythonProcess.stdin.writable) {
+    pythonProcess.stdin.write(JSON.stringify(frameData) + "\n");
   }
 });
