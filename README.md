@@ -1,4 +1,4 @@
-# Detecção de Pose com MediaPipe
+# Sistema de Análise Comparativa de Movimentos de Dança
 
 Este projeto implementa um sistema de detecção de pose em tempo real utilizando a biblioteca MediaPipe e OpenCV. O sistema captura vídeo da webcam e identifica os pontos-chave do corpo humano, desenhando-os na tela.
 
