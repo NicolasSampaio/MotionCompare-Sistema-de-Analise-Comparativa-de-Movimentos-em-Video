@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 declare const ipcRenderer: any;
 
 @Component({
@@ -38,6 +39,7 @@ declare const ipcRenderer: any;
       }
     `,
   ],
+  imports: [CommonModule],
 })
 export class AppComponent implements OnInit {
   statusMessage: string = '';
