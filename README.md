@@ -21,7 +21,6 @@ Este projeto implementa um sistema de detecção de pose em tempo real utilizand
 
 ```bash
 git clone https://github.com/NicolasSampaio/tcc
-cd tcc
 ```
 
 2. Instale as dependências:
