@@ -20,7 +20,7 @@ Este projeto implementa um sistema de detecção de pose em tempo real utilizand
 1. Clone este repositório:
 
 ```bash
-git clone https://github.com/NicolasSampaio/tcc
+git clone https://github.com/NicolasSampaio/Sistema-de-Analise-Comparativa-de-Movimentos-de-Danca
 ```
 
 2. Instale as dependências:
