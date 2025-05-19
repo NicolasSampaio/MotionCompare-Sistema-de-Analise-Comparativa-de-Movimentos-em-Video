@@ -3,7 +3,7 @@ import os
 import json
 from pathlib import Path
 from src.pose_storage import PoseStorage, PoseData, PoseFrame
-from src.pose_estimation import PoseLandmark
+from src.pose_models import PoseLandmark
 
 @pytest.fixture
 def storage():

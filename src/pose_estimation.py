@@ -7,6 +7,7 @@ from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 
 from .pose_storage import PoseStorage
+from .pose_models import PoseLandmark
 
 # Configuração do logging
 logging.basicConfig(
@@ -14,14 +15,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-@dataclass
-class PoseLandmark:
-    """Classe para representar um landmark do corpo."""
-    x: float
-    y: float
-    z: float
-    visibility: float
 
 class PoseExtractor:
     """Classe responsável por extrair pontos-chave do corpo usando MediaPipe."""

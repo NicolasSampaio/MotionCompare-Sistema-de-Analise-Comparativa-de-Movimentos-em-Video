@@ -7,7 +7,7 @@ from datetime import datetime
 import hashlib
 from pathlib import Path
 
-from .pose_estimation import PoseLandmark
+from .pose_models import PoseLandmark
 
 # Configuração do logging
 logging.basicConfig(
