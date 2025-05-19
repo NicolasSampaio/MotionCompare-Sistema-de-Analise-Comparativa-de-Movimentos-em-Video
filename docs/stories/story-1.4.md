@@ -55,7 +55,7 @@ Como desenvolvedor, eu preciso implementar um sistema de armazenamento estrutura
 - [x] Planejado
 - [x] Em Desenvolvimento
 - [x] Em Teste
-- [ ] Concluído
+- [x] Concluído
 - [ ] Cancelado
 
 ## Análise de Implementação

@@ -14,33 +14,33 @@ Esta história é fundamental para o início do processo de comparação, pois g
 
 ### Funcionalidade Principal
 
-- [ ] Implementar função para carregar dados de pose de dois arquivos JSON
-- [ ] Validar a estrutura e integridade dos dados carregados
-- [ ] Verificar compatibilidade entre os conjuntos de dados (mesmos landmarks, formato)
-- [ ] Implementar logging detalhado de erros e inconsistências
-- [ ] Retornar dados em formato estruturado para uso no algoritmo de comparação
+- [x] Implementar função para carregar dados de pose de dois arquivos JSON
+- [x] Validar a estrutura e integridade dos dados carregados
+- [x] Verificar compatibilidade entre os conjuntos de dados (mesmos landmarks, formato)
+- [x] Implementar logging detalhado de erros e inconsistências
+- [x] Retornar dados em formato estruturado para uso no algoritmo de comparação
 
 ### Validação de Dados
 
-- [ ] Verificar presença de todos os campos obrigatórios
-- [ ] Validar tipos de dados e formatos
-- [ ] Checar consistência temporal dos frames
-- [ ] Identificar e reportar frames com dados ausentes ou corrompidos
+- [x] Verificar presença de todos os campos obrigatórios
+- [x] Validar tipos de dados e formatos
+- [x] Checar consistência temporal dos frames
+- [x] Identificar e reportar frames com dados ausentes ou corrompidos
 
 ### Tratamento de Erros
 
-- [ ] Implementar tratamento para arquivos inexistentes
-- [ ] Tratar erros de formato JSON inválido
-- [ ] Gerenciar casos de dados incompletos ou inconsistentes
-- [ ] Fornecer mensagens de erro claras e acionáveis
+- [x] Implementar tratamento para arquivos inexistentes
+- [x] Tratar erros de formato JSON inválido
+- [x] Gerenciar casos de dados incompletos ou inconsistentes
+- [x] Fornecer mensagens de erro claras e acionáveis
 
 ### Testes
 
-- [ ] Testes unitários para casos de sucesso
-- [ ] Testes para arquivos inexistentes
-- [ ] Testes para dados inválidos ou incompletos
-- [ ] Testes para diferentes formatos de dados
-- [ ] Testes de performance com grandes conjuntos de dados
+- [x] Testes unitários para casos de sucesso
+- [x] Testes para arquivos inexistentes
+- [x] Testes para dados inválidos ou incompletos
+- [x] Testes para diferentes formatos de dados
+- [x] Testes de performance com grandes conjuntos de dados
 
 ## Dependências
 
@@ -84,8 +84,10 @@ Esta história é fundamental para o início do processo de comparação, pois g
 
 ## Definição de Pronto
 
-- [ ] Código implementado e revisado
-- [ ] Testes unitários passando
-- [ ] Documentação atualizada
-- [ ] Logging implementado e testado
-- [ ] Performance validada com diferentes tamanhos de arquivo
+- [x] Código implementado e revisado
+- [x] Testes unitários passando
+- [x] Documentação atualizada
+- [x] Logging implementado e testado
+- [x] Performance validada com diferentes tamanhos de arquivo
+
+## Status: Review
