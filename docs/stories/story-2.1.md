@@ -90,4 +90,4 @@ Esta história é fundamental para o início do processo de comparação, pois g
 - [x] Logging implementado e testado
 - [x] Performance validada com diferentes tamanhos de arquivo
 
-## Status: Review
+## Status: Concluída
