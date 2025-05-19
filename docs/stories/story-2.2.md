@@ -1,0 +1,95 @@
+# História 2.2: Desenvolvimento do Algoritmo Central de Comparação
+
+## Descrição
+
+Como desenvolvedor do sistema de análise comparativa de dança,
+Quero implementar o algoritmo principal que compara as sequências de pontos-chave dos dois vídeos,
+Para que possamos determinar o grau de similaridade entre os movimentos de dança.
+
+## Contexto
+
+Esta história é o coração do sistema de comparação, onde implementaremos a lógica que analisa as diferenças e similaridades entre dois movimentos de dança. O algoritmo precisa considerar tanto aspectos temporais quanto espaciais para fornecer uma análise precisa.
+
+## Critérios de Aceitação
+
+### Funcionalidade Principal
+
+- [ ] Implementar cálculo de similaridade quadro a quadro
+- [ ] Desenvolver sistema de sincronização temporal
+- [ ] Implementar diferentes métricas de distância (Euclidiana, DTW)
+- [ ] Gerar scores de similaridade global e por frame
+- [ ] Implementar logging detalhado do processo de comparação
+
+### Análise Temporal
+
+- [ ] Implementar alinhamento temporal dos vídeos
+- [ ] Considerar variações de velocidade na execução
+- [ ] Tratar diferenças de duração entre vídeos
+- [ ] Implementar normalização temporal
+
+### Análise Espacial
+
+- [ ] Implementar comparação de posições dos landmarks
+- [ ] Considerar ângulos entre segmentos corporais
+- [ ] Implementar normalização espacial
+- [ ] Tratar diferentes escalas e orientações
+
+### Testes
+
+- [ ] Testes unitários para cada componente do algoritmo
+- [ ] Testes de integração com o carregador de dados
+- [ ] Testes com diferentes tipos de movimentos
+- [ ] Testes de performance
+- [ ] Testes com casos de borda (vídeos muito diferentes)
+
+## Dependências
+
+- História 2.1 (Carregamento dos Dados de Pose para Dois Vídeos)
+
+## Estimativa
+
+- Complexidade: Alta
+- Esforço: 5 pontos
+
+## Notas Técnicas
+
+### Algoritmo de Comparação
+
+```python
+class DanceComparison:
+    def __init__(self, video1_data, video2_data):
+        self.video1 = video1_data
+        self.video2 = video2_data
+        self.metrics = {
+            'euclidean': self._euclidean_distance,
+            'dtw': self._dynamic_time_warping
+        }
+
+    def compare(self, metric='euclidean', params=None):
+        # Implementação do algoritmo de comparação
+        pass
+
+    def get_global_score(self):
+        # Cálculo do score global
+        pass
+
+    def get_frame_scores(self):
+        # Scores por frame
+        pass
+```
+
+### Considerações de Implementação
+
+1. Utilizar NumPy para operações vetoriais
+2. Implementar DTW para sincronização temporal
+3. Considerar uso de scipy para otimização
+4. Implementar cache para resultados intermediários
+
+## Definição de Pronto
+
+- [ ] Algoritmo implementado e revisado
+- [ ] Testes unitários e de integração passando
+- [ ] Documentação técnica completa
+- [ ] Performance validada
+- [ ] Logging implementado e testado
+- [ ] Código otimizado e limpo

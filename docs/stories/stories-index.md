@@ -6,12 +6,12 @@ Este arquivo indexa todas as Estórias de Usuário definidas para o projeto "Sis
 
 - **Objetivo:** Estabelecer o ambiente de desenvolvimento Python, integrar a biblioteca MediaPipe e implementar a funcionalidade central de carregar um vídeo de entrada (via linha de comando) e extrair com sucesso a sequência de pontos-chave (pose estimation) desse vídeo, salvando esses dados de forma utilizável.
 
-| ID  | Título da Estória                                     | Status  | Dependências | Link para Arquivo |
-| :-- | :---------------------------------------------------- | :------ | :----------- | :---------------- |
-| 1.1 | Configuração do Ambiente de Desenvolvimento Python    | A Fazer | Nenhuma      | `./1.1.story.md`  |
-| 1.2 | Implementação da Entrada de Vídeo via CLI             | A Fazer | 1.1          | `./1.2.story.md`  |
-| 1.3 | Extração de Pontos-Chave (Pose Estimation) do Vídeo   | A Fazer | 1.1, 1.2     | `./1.3.story.md`  |
-| 1.4 | Armazenamento Estruturado dos Dados de Pose Extraídos | A Fazer | 1.3          | `./1.4.story.md`  |
+| ID  | Título da Estória                                     | Status    | Dependências | Link para Arquivo |
+| :-- | :---------------------------------------------------- | :-------- | :----------- | :---------------- |
+| 1.1 | Configuração do Ambiente de Desenvolvimento Python    | Concluída | Nenhuma      | `./story-1.1.md`  |
+| 1.2 | Implementação da Entrada de Vídeo via CLI             | Concluída | 1.1          | `./story-1.2.md`  |
+| 1.3 | Extração de Pontos-Chave (Pose Estimation) do Vídeo   | Concluída | 1.1, 1.2     | `./story-1.3.md`  |
+| 1.4 | Armazenamento Estruturado dos Dados de Pose Extraídos | Concluída | 1.3          | `./story-1.4.md`  |
 
 ## Épico 2: Implementação da Lógica de Comparação de Movimentos
 
@@ -19,10 +19,10 @@ Este arquivo indexa todas as Estórias de Usuário definidas para o projeto "Sis
 
 | ID  | Título da Estória                                          | Status  | Dependências | Link para Arquivo |
 | :-- | :--------------------------------------------------------- | :------ | :----------- | :---------------- |
-| 2.1 | Carregamento dos Dados de Pose para Dois Vídeos            | A Fazer | 1.4          | `./2.1.story.md`  |
-| 2.2 | Desenvolvimento do Algoritmo Central de Comparação         | A Fazer | 2.1          | `./2.2.story.md`  |
-| 2.3 | Implementação da Parametrização da Análise de Similaridade | A Fazer | 2.2          | `./2.3.story.md`  |
-| 2.4 | Disponibilização Interna dos Resultados Brutos             | A Fazer | 2.2          | `./2.4.story.md`  |
+| 2.1 | Carregamento dos Dados de Pose para Dois Vídeos            | A Fazer | 1.4          | `./story-2.1.md`  |
+| 2.2 | Desenvolvimento do Algoritmo Central de Comparação         | A Fazer | 2.1          | `./story-2.2.md`  |
+| 2.3 | Implementação da Parametrização da Análise de Similaridade | A Fazer | 2.2          | `./story-2.3.md`  |
+| 2.4 | Disponibilização Interna dos Resultados Brutos             | A Fazer | 2.2          | `./story-2.4.md`  |
 
 ## Épico 3: Geração e Apresentação de Resultados da Análise
 
@@ -30,9 +30,9 @@ Este arquivo indexa todas as Estórias de Usuário definidas para o projeto "Sis
 
 | ID  | Título da Estória                                             | Status  | Dependências | Link para Arquivo |
 | :-- | :------------------------------------------------------------ | :------ | :----------- | :---------------- |
-| 3.1 | Acesso aos Resultados Detalhados da Comparação para Relatório | A Fazer | 2.4          | `./3.1.story.md`  |
-| 3.2 | Formatação do Conteúdo do Relatório de Análise Comparativa    | A Fazer | 3.1          | `./3.2.story.md`  |
-| 3.3 | Exibição do Relatório de Comparação na Linha de Comando       | A Fazer | 3.2          | `./3.3.story.md`  |
-| 3.4 | Salvamento do Relatório de Comparação em Arquivo              | A Fazer | 3.2          | `./3.4.story.md`  |
+| 3.1 | Acesso aos Resultados Detalhados da Comparação para Relatório | A Fazer | 2.4          | `./story-3.1.md`  |
+| 3.2 | Formatação do Conteúdo do Relatório de Análise Comparativa    | A Fazer | 3.1          | `./story-3.2.md`  |
+| 3.3 | Exibição do Relatório de Comparação na Linha de Comando       | A Fazer | 3.2          | `./story-3.3.md`  |
+| 3.4 | Salvamento do Relatório de Comparação em Arquivo              | A Fazer | 3.2          | `./story-3.4.md`  |
 
 **Nota:** O status das estórias deve ser atualizado neste índice conforme elas progridem (ex: A Fazer, Em Progresso, Revisão, Concluída). Os arquivos individuais de estória (`.story.md`) conterão os detalhes completos, incluindo descrição e Critérios de Aceitação.
