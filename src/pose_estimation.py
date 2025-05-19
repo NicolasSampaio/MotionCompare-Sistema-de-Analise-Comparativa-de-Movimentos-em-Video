@@ -55,6 +55,12 @@ class PoseExtractor:
         self.resolution = (0, 0)
         self.total_frames = 0
 
+    def close(self):
+        """Libera explicitamente os recursos do MediaPipe."""
+        if hasattr(self, 'pose') and self.pose:
+            self.pose.close()
+            self.pose = None # Define como None após fechar
+
     def normalize_landmarks(self, landmarks: Dict[int, PoseLandmark]) -> Dict[int, PoseLandmark]:
         """
         Normaliza os landmarks se a normalização estiver ativada.
@@ -365,4 +371,5 @@ class PoseExtractor:
 
     def __del__(self):
         """Libera recursos do MediaPipe."""
-        self.pose.close() 
+        # Chama o método close para garantir a liberação dos recursos
+        self.close()
