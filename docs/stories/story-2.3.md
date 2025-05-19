@@ -14,32 +14,32 @@ Esta história permite que os usuários personalizem a análise de similaridade 
 
 ### Funcionalidade Principal
 
-- [ ] Implementar interface CLI para configuração de parâmetros
-- [ ] Desenvolver sistema de validação de parâmetros
-- [ ] Implementar documentação dos parâmetros disponíveis
-- [ ] Criar exemplos de uso com diferentes configurações
+- [x] Implementar interface CLI para configuração de parâmetros
+- [x] Desenvolver sistema de validação de parâmetros
+- [x] Implementar documentação dos parâmetros disponíveis
+- [x] Criar exemplos de uso com diferentes configurações
 
 ### Parâmetros Configuráveis
 
-- [ ] Métrica de distância (Euclidiana, DTW)
-- [ ] Tolerância de similaridade
-- [ ] Pesos para diferentes landmarks
-- [ ] Configurações de sincronização temporal
-- [ ] Opções de normalização
+- [x] Métrica de distância (Euclidiana, DTW)
+- [x] Tolerância de similaridade
+- [x] Pesos para diferentes landmarks
+- [x] Configurações de sincronização temporal
+- [x] Opções de normalização
 
 ### Validação e Documentação
 
-- [ ] Validar valores e ranges dos parâmetros
-- [ ] Documentar impacto de cada parâmetro
-- [ ] Criar exemplos de configurações comuns
-- [ ] Implementar mensagens de erro claras
+- [x] Validar valores e ranges dos parâmetros
+- [x] Documentar impacto de cada parâmetro
+- [x] Criar exemplos de configurações comuns
+- [x] Implementar mensagens de erro claras
 
 ### Testes
 
-- [ ] Testes para diferentes combinações de parâmetros
-- [ ] Testes de validação de parâmetros
-- [ ] Testes de integração com o algoritmo
-- [ ] Testes de performance com diferentes configurações
+- [x] Testes para diferentes combinações de parâmetros
+- [x] Testes de validação de parâmetros
+- [x] Testes de integração com o algoritmo
+- [x] Testes de performance com diferentes configurações
 
 ## Dependências
 
@@ -75,11 +75,23 @@ class ComparisonParams:
 3. Criar documentação clara e exemplos
 4. Considerar uso de arquivo de configuração
 
+## Log de Implementação
+
+- [x] Parâmetros de comparação implementados em `src/comparison_params.py`.
+- [x] Validação automática dos parâmetros (inclusive métrica).
+- [x] Interface CLI atualizada para aceitar parâmetros via argumentos ou arquivo JSON.
+- [x] Documentação criada em `docs/parametros_comparacao.md`.
+- [x] Exemplos de uso em `examples/comparacao_exemplo.py` e `examples/config.json`.
+- [x] Testes unitários e de integração cobrindo todos os cenários relevantes.
+- [x] Código revisado para escalabilidade e clareza.
+
 ## Definição de Pronto
 
-- [ ] Sistema de parametrização implementado
-- [ ] Documentação completa
-- [ ] Testes passando
-- [ ] Exemplos de uso criados
-- [ ] Interface CLI testada
-- [ ] Validação de parâmetros implementada
+- [x] Sistema de parametrização implementado
+- [x] Documentação completa
+- [x] Testes passando
+- [x] Exemplos de uso criados
+- [x] Interface CLI testada
+- [x] Validação de parâmetros implementada
+
+### Status: Concluído
