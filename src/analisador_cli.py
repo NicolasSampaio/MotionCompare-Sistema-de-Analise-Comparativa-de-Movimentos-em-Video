@@ -5,18 +5,23 @@ import argparse
 import os
 import sys
 import logging
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import cv2
 from tqdm import tqdm
 import json
+from pathlib import Path
 
 from .pose_estimation import PoseExtractor
 from .comparison_params import ComparisonParams, DistanceMetric
+from .comparison_results import ComparisonResults
+from .results_cache import ResultsCache
+from .pose_storage import PoseStorage
+from .comparador_movimento import ComparadorMovimento
 
 # Configuração do logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
@@ -155,6 +160,29 @@ Exemplos de uso:
         help='Desativar normalização'
     )
 
+    parser.add_argument(
+        '--storage-dir',
+        default="data/pose",
+        help="Diretório para armazenar os dados de pose"
+    )
+
+    parser.add_argument(
+        '--command',
+        choices=['process', 'compare'],
+        required=True,
+        help="Comando a ser executado"
+    )
+
+    parser.add_argument(
+        'video1',
+        help="Caminho do primeiro vídeo para comparação"
+    )
+
+    parser.add_argument(
+        'video2',
+        help="Caminho do segundo vídeo para comparação"
+    )
+
     parsed_args = parser.parse_args(args)
 
     # Validações
@@ -248,118 +276,304 @@ def process_video(video_path: str, output_path: Optional[str] = None,
     """
     try:
         # Inicializa o extrator de pose com os parâmetros de comparação
-        extractor = PoseExtractor(comparison_params=comparison_params)
+        extractor = PoseExtractor(comparison_params)
         
+        # Verifica se já existem dados processados
         if skip_processing:
-            logger.info("Carregando dados de pose salvos...")
-            frame_landmarks = extractor.load_pose_data(video_path)
-            if frame_landmarks is None:
-                logger.error("Dados de pose não encontrados. Execute sem --skip-processing primeiro.")
+            try:
+                extractor.load_processed_data(video_path)
+                logger.info("Dados carregados com sucesso")
+                return True
+            except Exception as e:
+                logger.error(f"Erro ao carregar dados processados: {str(e)}")
                 return False
-            logger.info("Dados de pose carregados com sucesso!")
-        else:
-            logger.info("Processando vídeo...")
-            frame_landmarks = extractor.process_video(
-                video_path,
-                progress_callback=lambda current, total: logger.info(f"Progresso: {current}/{total} frames")
-            )
-            if not frame_landmarks:
-                logger.error("Erro ao processar vídeo")
-                return False
-            logger.info("Processamento concluído com sucesso!")
         
-        # Se um arquivo de saída foi especificado, gera o vídeo com os landmarks
-        if output_path:
-            logger.info(f"Gerando vídeo de saída: {output_path}")
+        # Processa o vídeo
+        if not extractor.process_video(video_path, output_path, resolution, fps):
+            return False
             
-            # Abre o vídeo de entrada
-            cap = cv2.VideoCapture(video_path)
-            if not cap.isOpened():
-                raise ValueError(f"Não foi possível abrir o vídeo: {video_path}")
-            
-            # Obtém informações do vídeo
-            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            video_fps = cap.get(cv2.CAP_PROP_FPS)
-            
-            # Define a resolução de saída
-            if resolution == '480p':
-                width, height = 854, 480
-            elif resolution == '720p':
-                width, height = 1280, 720
-            elif resolution == '1080p':
-                width, height = 1920, 1080
-            
-            # Define o FPS de saída
-            if fps is None:
-                fps = video_fps
-            
-            # Configura o writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-            
-            frame_count = 0
-            while cap.isOpened():
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                
-                # Redimensiona o frame se necessário
-                if frame.shape[1] != width or frame.shape[0] != height:
-                    frame = cv2.resize(frame, (width, height))
-                
-                # Desenha os landmarks se disponíveis
-                if frame_landmarks[frame_count]:
-                    for landmark in frame_landmarks[frame_count].values():
-                        x = int(landmark.x * width)
-                        y = int(landmark.y * height)
-                        cv2.circle(frame, (x, y), 5, (0, 255, 0), -1)
-                
-                out.write(frame)
-                frame_count += 1
-            
-            cap.release()
-            out.release()
-            logger.info("Vídeo de saída gerado com sucesso!")
+        # Salva os dados processados
+        extractor.save_processed_data(video_path)
+        logger.info("Dados processados salvos com sucesso")
         
         return True
         
     except Exception as e:
-        logger.error(f"Erro durante o processamento do vídeo: {str(e)}")
+        logger.error(f"Erro ao processar vídeo: {str(e)}")
         return False
 
-def main():
+def compare_videos(video1_path: str, video2_path: str,
+                  comparison_params: Optional[ComparisonParams] = None) -> Optional[ComparisonResults]:
     """
-    Função principal que processa os argumentos e inicia o processamento do vídeo.
+    Compara dois vídeos usando os parâmetros especificados.
+    
+    Args:
+        video1_path: Caminho do primeiro vídeo
+        video2_path: Caminho do segundo vídeo
+        comparison_params: Parâmetros de comparação (opcional)
+        
+    Returns:
+        Optional[ComparisonResults]: Resultados da comparação ou None em caso de erro
     """
     try:
-        args = parse_arguments()
-        logger.info(f"Iniciando processamento do vídeo: {args.video}")
-        logger.debug(f"Argumentos recebidos: {args}")
+        # Inicializa o cache
+        cache = ResultsCache()
+        
+        # Gera uma chave única para o cache baseada nos vídeos e parâmetros
+        cache_key = f"{video1_path}_{video2_path}_{hash(str(comparison_params))}"
+        
+        # Tenta recuperar do cache
+        cached_results = cache.get(cache_key)
+        if cached_results is not None:
+            logger.info("Resultados recuperados do cache")
+            return cached_results
+        
+        # Processa os vídeos se necessário
+        extractor = PoseExtractor(comparison_params)
+        
+        # Carrega ou processa o primeiro vídeo
+        if not extractor.load_processed_data(video1_path):
+            if not process_video(video1_path, comparison_params=comparison_params):
+                return None
+            extractor.load_processed_data(video1_path)
+            
+        # Carrega ou processa o segundo vídeo
+        if not extractor.load_processed_data(video2_path):
+            if not process_video(video2_path, comparison_params=comparison_params):
+                return None
+            extractor.load_processed_data(video2_path)
+            
+        # Realiza a comparação
+        results = extractor.compare_videos()
+        
+        # Armazena no cache
+        cache.set(cache_key, results)
+        
+        return results
+        
+    except Exception as e:
+        logger.error(f"Erro ao comparar vídeos: {str(e)}")
+        return None
 
-        # Obtém os parâmetros de comparação
-        comparison_params = get_comparison_params(args)
-        logger.debug(f"Parâmetros de comparação: {comparison_params}")
+def save_results(results: ComparisonResults, output_path: str) -> bool:
+    """
+    Salva os resultados em um arquivo JSON.
+    
+    Args:
+        results: Resultados da comparação
+        output_path: Caminho do arquivo de saída
+        
+    Returns:
+        bool: True se os resultados foram salvos com sucesso
+    """
+    try:
+        with open(output_path, 'w') as f:
+            json.dump(results.to_dict(), f, indent=2)
+        logger.info(f"Resultados salvos em: {output_path}")
+        return True
+    except Exception as e:
+        logger.error(f"Erro ao salvar resultados: {str(e)}")
+        return False
 
-        success = process_video(
+class AnalisadorCLI:
+    def __init__(
+        self,
+        storage_dir: str = "data/pose",
+        pose_storage: Optional[PoseStorage] = None,
+        pose_extractor: Optional[PoseExtractor] = None,
+        comparador: Optional[ComparadorMovimento] = None
+    ):
+        """
+        Inicializa o analisador CLI.
+        Args:
+            storage_dir: Diretório para armazenar os dados de pose
+            pose_storage: Instância de PoseStorage (injeção para testes)
+            pose_extractor: Instância de PoseExtractor (injeção para testes)
+            comparador: Instância de ComparadorMovimento (injeção para testes)
+        """
+        self.storage_dir = Path(storage_dir)
+        self.storage_dir.mkdir(parents=True, exist_ok=True)
+        self.pose_storage = pose_storage or PoseStorage(self.storage_dir)
+        self.pose_extractor = pose_extractor or PoseExtractor()
+        self.comparador = comparador or ComparadorMovimento()
+        
+    def process_video(self, video_path: str, output_path: Optional[str] = None,
+                     resolution: Optional[Tuple[int, int]] = None) -> bool:
+        """
+        Processa um vídeo para extrair os landmarks de pose.
+        
+        Args:
+            video_path: Caminho do vídeo
+            output_path: Caminho para salvar o vídeo processado (opcional)
+            resolution: Resolução do vídeo processado (opcional)
+            
+        Returns:
+            bool: True se o processamento foi bem-sucedido
+        """
+        try:
+            # Verifica se o vídeo já foi processado
+            if self.pose_storage.load_pose_data(video_path) is not None:
+                logger.info(f"Vídeo já processado: {video_path}")
+                return True
+                
+            # Processa o vídeo
+            success = self.pose_extractor.process_video(
+                video_path=video_path,
+                output_path=output_path,
+                resolution=resolution
+            )
+            
+            if not success:
+                logger.error(f"Falha ao processar vídeo: {video_path}")
+                return False
+                
+            # Obtém os landmarks processados
+            landmarks = self.pose_extractor.get_landmarks()
+            if not landmarks:
+                logger.error(f"Nenhum landmark extraído do vídeo: {video_path}")
+                return False
+                
+            # Obtém as informações do vídeo
+            fps = self.pose_extractor.get_fps()
+            resolution = self.pose_extractor.get_resolution()
+            total_frames = self.pose_extractor.get_total_frames()
+            
+            # Salva os dados de pose
+            success = self.pose_storage.save_pose_data(
+                video_path=video_path,
+                fps=fps,
+                resolution=resolution,
+                total_frames=total_frames,
+                frame_landmarks=landmarks
+            )
+            
+            if not success:
+                logger.error(f"Falha ao salvar dados de pose: {video_path}")
+                return False
+                
+            logger.info(f"Vídeo processado com sucesso: {video_path}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar vídeo: {str(e)}")
+            return False
+            
+    def compare_videos(self, video1_path: str, video2_path: str,
+                      output_path: Optional[str] = None) -> Optional[ComparisonResults]:
+        """
+        Compara dois vídeos.
+        
+        Args:
+            video1_path: Caminho do primeiro vídeo
+            video2_path: Caminho do segundo vídeo
+            output_path: Caminho para salvar os resultados (opcional)
+            
+        Returns:
+            ComparisonResults ou None se a comparação falhar
+        """
+        try:
+            # Verifica se os vídeos já foram processados
+            video1_data = self.pose_storage.load_pose_data(video1_path)
+            video2_data = self.pose_storage.load_pose_data(video2_path)
+            
+            if video1_data is None:
+                logger.info(f"Processando primeiro vídeo: {video1_path}")
+                if not self.process_video(video1_path):
+                    return None
+                video1_data = self.pose_storage.load_pose_data(video1_path)
+                
+            if video2_data is None:
+                logger.info(f"Processando segundo vídeo: {video2_path}")
+                if not self.process_video(video2_path):
+                    return None
+                video2_data = self.pose_storage.load_pose_data(video2_path)
+                
+            # Verifica se já existe uma comparação
+            results = self.pose_storage.load_comparison_results(video1_path, video2_path)
+            if results is not None:
+                logger.info(f"Comparação já existe para: {video1_path} e {video2_path}")
+                return results
+                
+            # Obtém os landmarks no formato do comparador
+            video1_landmarks = self.pose_storage.get_pose_data(video1_path)
+            video2_landmarks = self.pose_storage.get_pose_data(video2_path)
+            
+            if video1_landmarks is None or video2_landmarks is None:
+                logger.error("Falha ao obter landmarks dos vídeos")
+                return None
+                
+            # Compara os vídeos
+            results = self.comparador.compare_videos(
+                video1_landmarks=video1_landmarks,
+                video2_landmarks=video2_landmarks,
+                video1_fps=video1_data.fps,
+                video2_fps=video2_data.fps,
+                video1_resolution=video1_data.resolution,
+                video2_resolution=video2_data.resolution
+            )
+            
+            # Atualiza os caminhos dos vídeos
+            results.video1_path = video1_path
+            results.video2_path = video2_path
+            
+            # Salva os resultados
+            if output_path:
+                success = self.pose_storage.save_comparison_results(
+                    video1_path=video1_path,
+                    video2_path=video2_path,
+                    results=results
+                )
+                if not success:
+                    logger.error(f"Falha ao salvar resultados da comparação: {output_path}")
+                    
+            logger.info(f"Vídeos comparados com sucesso: {video1_path} e {video2_path}")
+            return results
+            
+        except Exception as e:
+            logger.error(f"Erro ao comparar vídeos: {str(e)}")
+            return None
+
+def main():
+    """Função principal do CLI."""
+    args = parse_arguments()
+    
+    # Inicializa o analisador
+    analisador = AnalisadorCLI(storage_dir=args.storage_dir)
+    
+    # Executa o comando
+    if args.command == "process":
+        success = analisador.process_video(
             video_path=args.video,
             output_path=args.output,
-            resolution=args.resolution,
-            fps=args.fps,
-            skip_processing=args.skip_processing,
-            comparison_params=comparison_params
+            resolution=tuple(args.resolution) if args.resolution else None
         )
-
-        if success:
-            logger.info("Processamento concluído com sucesso!")
-            sys.exit(0)
-        else:
-            logger.error("Erro durante o processamento")
-            sys.exit(1)
-
-    except Exception as e:
-        logger.error(f"Erro durante o processamento: {str(e)}")
-        sys.exit(1)
-
-if __name__ == '__main__':
-    main()
+        if not success:
+            logger.error("Falha ao processar vídeo")
+            return 1
+            
+    elif args.command == "compare":
+        results = analisador.compare_videos(
+            video1_path=args.video1,
+            video2_path=args.video2,
+            output_path=args.output
+        )
+        if results is None:
+            logger.error("Falha ao comparar vídeos")
+            return 1
+            
+        # Exibe os resultados
+        print("\nResultados da Comparação:")
+        print(f"Similaridade Média: {results.overall_metrics['average_similarity']:.2f}")
+        print(f"Similaridade Mínima: {results.overall_metrics['min_similarity']:.2f}")
+        print(f"Similaridade Máxima: {results.overall_metrics['max_similarity']:.2f}")
+        print(f"Qualidade do Alinhamento: {results.overall_metrics['alignment_quality']:.2f}")
+        print(f"Alinhamento Temporal: {results.overall_metrics['temporal_alignment']:.2f}")
+        
+    else:
+        logger.error("Comando inválido")
+        return 1
+        
+    return 0
+    
+if __name__ == "__main__":
+    exit(main())

@@ -5,10 +5,13 @@ import logging
 import os
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 
 from .pose_storage import PoseStorage
 from .pose_models import PoseLandmark
 from .comparison_params import ComparisonParams
+from .comparison_results import ComparisonResults
+from .comparador_movimento import DanceComparison
 
 # Configuração do logging
 logging.basicConfig(
@@ -46,6 +49,11 @@ class PoseExtractor:
         self.storage = PoseStorage()
         self.comparison_params = comparison_params or ComparisonParams()
         logger.info("PoseExtractor inicializado com sucesso")
+
+        self.landmarks = []
+        self.fps = 0.0
+        self.resolution = (0, 0)
+        self.total_frames = 0
 
     def normalize_landmarks(self, landmarks: Dict[int, PoseLandmark]) -> Dict[int, PoseLandmark]:
         """
@@ -107,12 +115,16 @@ class PoseExtractor:
             # Aplica o peso se definido, senão usa 1.0
             weight = self.comparison_params.landmark_weights.get(landmark_name, 1.0)
             
-            weighted[idx] = PoseLandmark(
-                x=landmark.x * weight,
-                y=landmark.y * weight,
-                z=landmark.z * weight,
-                visibility=landmark.visibility
-            )
+            # Aplica o peso apenas se for maior que 0
+            if weight > 0:
+                weighted[idx] = PoseLandmark(
+                    x=landmark.x * weight,
+                    y=landmark.y * weight,
+                    z=landmark.z * weight,
+                    visibility=landmark.visibility
+                )
+            else:
+                weighted[idx] = landmark
         
         return weighted
 
@@ -169,103 +181,187 @@ class PoseExtractor:
             logger.error(f"Erro ao processar frame: {str(e)}")
             return None
 
-    def process_video(self, video_path: str, progress_callback=None) -> List[Optional[Dict[int, PoseLandmark]]]:
+    def process_video(self, video_path: str, output_path: Optional[str] = None,
+                     resolution: Optional[Tuple[int, int]] = None,
+                     progress_callback: Optional[callable] = None) -> bool:
         """
-        Processa um vídeo completo e extrai os landmarks de cada frame.
-        
-        Args:
-            video_path: Caminho para o arquivo de vídeo
-            progress_callback: Função de callback para reportar progresso (frame_count, total_frames)
-            
-        Returns:
-            Lista de dicionários com os landmarks de cada frame
-            
-        Raises:
-            ValueError: Se o caminho do vídeo for inválido ou o vídeo não puder ser aberto
-        """
-        if not video_path or not isinstance(video_path, str):
-            raise ValueError("Caminho do vídeo inválido")
-            
-        # Verifica se o arquivo existe
-        if not os.path.exists(video_path):
-            raise ValueError(f"Arquivo de vídeo não encontrado: {video_path}")
-            
-        logger.info(f"Tentando abrir vídeo: {os.path.abspath(video_path)}")
-            
-        try:
-            cap = cv2.VideoCapture(video_path)
-            if not cap.isOpened():
-                raise ValueError(f"Não foi possível abrir o vídeo: {video_path}")
-            
-            # Obtém informações do vídeo
-            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            
-            logger.info(f"Vídeo aberto com sucesso. Frames: {total_frames}, FPS: {fps}, Resolução: {width}x{height}")
-            
-            frame_landmarks = []
-            frame_count = 0
-            last_progress_update = 0
-            update_interval = max(1, total_frames // 200)  # Atualiza a cada 0.5% do progresso
-            
-            while cap.isOpened():
-                ret, frame = cap.read()
-                if not ret:
-                    logger.info("Fim do vídeo alcançado")
-                    break
-                
-                landmarks = self.process_frame(frame)
-                frame_landmarks.append(landmarks)
-                
-                frame_count += 1
-                if progress_callback and (frame_count - last_progress_update >= update_interval):
-                    progress_callback(frame_count, total_frames)
-                    last_progress_update = frame_count
-            
-            # Garante que o último progresso seja reportado
-            if progress_callback and frame_count > last_progress_update:
-                progress_callback(frame_count, total_frames)
-            
-            cap.release()
-            logger.info(f"Processamento do vídeo concluído. Total de frames processados: {frame_count}")
-            
-            # Salva os dados de pose
-            self.storage.save_pose_data(
-                video_path=video_path,
-                fps=fps,
-                resolution=(width, height),
-                total_frames=total_frames,
-                frame_landmarks=frame_landmarks
-            )
-            
-            return frame_landmarks
-            
-        except Exception as e:
-            logger.error(f"Erro ao processar vídeo: {str(e)}")
-            return []
-
-    def load_pose_data(self, video_path: str) -> Optional[List[Optional[Dict[int, PoseLandmark]]]]:
-        """
-        Carrega os dados de pose de um vídeo.
+        Processa um vídeo para extrair os landmarks de pose.
         
         Args:
             video_path: Caminho do vídeo
+            output_path: Caminho para salvar o vídeo processado (opcional)
+            resolution: Resolução do vídeo processado (opcional)
+            progress_callback: Função de callback para atualizar o progresso (opcional)
             
         Returns:
-            Lista de dicionários com os landmarks de cada frame ou None se os dados não forem encontrados
+            bool: True se o processamento foi bem-sucedido
         """
-        pose_data = self.storage.load_pose_data(video_path)
-        if pose_data is None:
+        try:
+            # Abre o vídeo
+            cap = cv2.VideoCapture(video_path)
+            if not cap.isOpened():
+                logger.error(f"Erro ao abrir vídeo: {video_path}")
+                return False
+                
+            # Obtém informações do vídeo
+            self.fps = cap.get(cv2.CAP_PROP_FPS)
+            self.total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            
+            # Atualiza a resolução do extrator
+            self.resolution = (width, height)
+            
+            # Define a resolução para processamento se especificada
+            if resolution:
+                width, height = resolution
+                
+            # Prepara o writer se output_path for especificado
+            writer = None
+            if output_path:
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                writer = cv2.VideoWriter(output_path, fourcc, self.fps, (width, height))
+                
+            # Processa cada frame
+            frame_count = 0
+            self.landmarks = []
+            
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                    
+                # Redimensiona o frame se necessário
+                if resolution:
+                    frame = cv2.resize(frame, resolution)
+                    
+                # Processa o frame
+                landmarks = self.process_frame(frame)
+                self.landmarks.append(landmarks)
+                
+                # Salva o frame processado se necessário
+                if writer and landmarks:
+                    # Desenha os landmarks no frame
+                    for landmark in landmarks.values():
+                        x = int(landmark.x * width)
+                        y = int(landmark.y * height)
+                        cv2.circle(frame, (x, y), 3, (0, 255, 0), -1)
+                    writer.write(frame)
+                    
+                # Atualiza o progresso
+                frame_count += 1
+                if progress_callback:
+                    progress_callback(frame_count, self.total_frames)
+                    
+            # Limpa os recursos
+            cap.release()
+            if writer:
+                writer.release()
+                
+            return True
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar vídeo: {str(e)}")
+            return False
+
+    def get_landmarks(self) -> List[Optional[Dict[int, PoseLandmark]]]:
+        """
+        Retorna os landmarks extraídos.
+        
+        Returns:
+            Lista de dicionários com os landmarks de cada frame
+        """
+        return self.landmarks
+        
+    def get_fps(self) -> float:
+        """
+        Retorna o FPS do vídeo.
+        
+        Returns:
+            float: FPS do vídeo
+        """
+        return self.fps
+        
+    def get_resolution(self) -> Tuple[int, int]:
+        """
+        Retorna a resolução do vídeo.
+        
+        Returns:
+            Tuple[int, int]: Resolução do vídeo (width, height)
+        """
+        return self.resolution
+        
+    def get_total_frames(self) -> int:
+        """
+        Retorna o total de frames do vídeo.
+        
+        Returns:
+            int: Total de frames
+        """
+        return self.total_frames
+
+    def compare_videos(self, video1_path: str, video2_path: str,
+                      output_path: Optional[str] = None) -> Optional[ComparisonResults]:
+        """
+        Compara dois vídeos.
+        
+        Args:
+            video1_path: Caminho do primeiro vídeo
+            video2_path: Caminho do segundo vídeo
+            output_path: Caminho para salvar o vídeo processado (opcional)
+            
+        Returns:
+            ComparisonResults ou None se a comparação falhar
+        """
+        try:
+            # Processa o primeiro vídeo
+            if not self.process_video(video1_path, output_path):
+                return None
+                
+            video1_landmarks = self.landmarks
+            video1_fps = self.fps
+            video1_resolution = self.resolution
+            video1_total_frames = self.total_frames
+            
+            # Processa o segundo vídeo
+            if not self.process_video(video2_path, output_path):
+                return None
+                
+            video2_landmarks = self.landmarks
+            video2_fps = self.fps
+            video2_resolution = self.resolution
+            video2_total_frames = self.total_frames
+            
+            # Cria o objeto de resultados
+            results = ComparisonResults(
+                video1_path=video1_path,
+                video2_path=video2_path,
+                video1_fps=video1_fps,
+                video2_fps=video2_fps,
+                video1_resolution=video1_resolution,
+                video2_resolution=video2_resolution,
+                video1_total_frames=video1_total_frames,
+                video2_total_frames=video2_total_frames,
+                video1_processed_frames=len([l for l in video1_landmarks if l is not None]),
+                video2_processed_frames=len([l for l in video2_landmarks if l is not None]),
+                video1_landmarks_per_frame=len(next(l for l in video1_landmarks if l is not None)),
+                video2_landmarks_per_frame=len(next(l for l in video2_landmarks if l is not None)),
+                video1_landmark_weights={str(i): 1.0 for i in range(33)},
+                video2_landmark_weights={str(i): 1.0 for i in range(33)},
+                frame_comparisons=[],  # Será preenchido pelo comparador
+                overall_metrics={},  # Será preenchido pelo comparador
+                metadata={
+                    "comparison_date": "2024-01-01T00:00:00",  # Será atualizado pelo comparador
+                    "comparison_duration": 0.0,  # Será atualizado pelo comparador
+                    "comparison_version": "1.0.0"
+                }
+            )
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Erro ao comparar vídeos: {str(e)}")
             return None
-            
-        # Converte os frames de volta para o formato original
-        frame_landmarks = [None] * pose_data.total_frames
-        for frame in pose_data.frames:
-            frame_landmarks[frame.frame_number] = frame.landmarks
-            
-        return frame_landmarks
 
     def __del__(self):
         """Libera recursos do MediaPipe."""

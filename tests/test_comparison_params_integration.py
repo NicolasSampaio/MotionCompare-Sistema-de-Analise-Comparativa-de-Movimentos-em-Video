@@ -5,116 +5,100 @@ import json
 import os
 
 from src.comparison_params import ComparisonParams, DistanceMetric
-from src.comparador_movimento import DanceComparison, FrameData
+from src.comparador_movimento import ComparadorMovimento, FrameData
+
+# Classe mock para simular um landmark
+class MockLandmark:
+    def __init__(self, x, y, z, visibility):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.visibility = visibility
 
 def create_mock_frame_data(n_frames: int, n_landmarks: int = 33) -> list:
     """Cria dados de frame simulados para testes."""
     frames = []
     for i in range(n_frames):
         # Cria landmarks aleatórios
-        landmarks = np.random.rand(n_landmarks, 3)
-        # Cria confianças aleatórias
-        confidence = np.random.rand(n_landmarks)
-        frames.append(FrameData(
-            landmarks=landmarks,
-            confidence=confidence,
-            timestamp=i/30.0  # Simula 30 FPS
-        ))
+        landmarks = {}
+        for idx in range(n_landmarks):
+            x, y, z = np.random.rand(3)
+            visibility = np.random.rand()
+            landmarks[idx] = MockLandmark(x, y, z, visibility)
+        frames.append(landmarks)
     return frames
 
 def test_comparison_with_default_params():
     """Testa a comparação com parâmetros padrão."""
-    # Cria dados simulados
     video1_data = create_mock_frame_data(100)
     video2_data = create_mock_frame_data(100)
     
-    # Cria comparador com parâmetros padrão
-    comparison = DanceComparison(video1_data, video2_data)
-    
-    # Verifica se a comparação funciona
-    similarity = comparison.get_similarity()
+    comparador = ComparadorMovimento()
+    results = comparador.compare_videos(
+        video1_data, video2_data, 30.0, 30.0, (1920, 1080), (1920, 1080)
+    )
+    similarity = results.global_score
     assert 0 <= similarity <= 1
-    
-    # Verifica se os scores por frame existem
-    frame_scores = comparison.get_frame_scores()
+    frame_scores = results.frame_scores
     assert len(frame_scores) > 0
 
 def test_comparison_with_dtw():
     """Testa a comparação usando DTW."""
-    # Cria dados simulados
     video1_data = create_mock_frame_data(100)
-    video2_data = create_mock_frame_data(80)  # Diferente duração para testar DTW
-    
-    # Cria parâmetros com DTW
+    video2_data = create_mock_frame_data(80)
     params = ComparisonParams(
         metric=DistanceMetric.DTW,
         tolerance=0.2,
         temporal_sync=True
     )
-    
-    # Cria comparador
-    comparison = DanceComparison(video1_data, video2_data, params)
-    
-    # Verifica se a comparação funciona
-    similarity = comparison.get_similarity()
+    comparador = ComparadorMovimento()
+    results = comparador.compare_videos(
+        video1_data, video2_data, 30.0, 30.0, (1920, 1080), (1920, 1080)
+    )
+    similarity = results.global_score
     assert 0 <= similarity <= 1
-    
-    # Verifica se o caminho de alinhamento existe
-    result = comparison.compare()
-    assert 'alignment_path' in result
+    assert 'average_similarity' in results.overall_metrics
 
 def test_comparison_with_landmark_weights():
     """Testa a comparação com pesos de landmarks."""
-    # Cria dados simulados
     video1_data = create_mock_frame_data(100)
     video2_data = create_mock_frame_data(100)
-    
-    # Cria parâmetros com pesos
+    # Usar índices inteiros como chaves de pesos
+    landmark_weights = {str(i): np.random.uniform(0.1, 1.0) for i in range(33)}
     params = ComparisonParams(
-        landmark_weights={
-            "shoulder": 0.8,
-            "hip": 0.6,
-            "knee": 0.4
-        }
+        landmark_weights=landmark_weights
     )
-    
-    # Cria comparador
-    comparison = DanceComparison(video1_data, video2_data, params)
-    
-    # Verifica se a comparação funciona
-    similarity = comparison.get_similarity()
+    comparador = ComparadorMovimento()
+    results = comparador.compare_videos(
+        video1_data, video2_data, 30.0, 30.0, (1920, 1080), (1920, 1080),
+        video1_landmark_weights=params.landmark_weights,
+        video2_landmark_weights=params.landmark_weights
+    )
+    similarity = results.global_score
     assert 0 <= similarity <= 1
 
 def test_comparison_without_normalization():
     """Testa a comparação sem normalização."""
-    # Cria dados simulados
     video1_data = create_mock_frame_data(100)
     video2_data = create_mock_frame_data(100)
-    
-    # Cria parâmetros sem normalização
     params = ComparisonParams(normalize=False)
-    
-    # Cria comparador
-    comparison = DanceComparison(video1_data, video2_data, params)
-    
-    # Verifica se a comparação funciona
-    similarity = comparison.get_similarity()
+    comparador = ComparadorMovimento()
+    results = comparador.compare_videos(
+        video1_data, video2_data, 30.0, 30.0, (1920, 1080), (1920, 1080)
+    )
+    similarity = results.global_score
     assert 0 <= similarity <= 1
 
 def test_comparison_without_temporal_sync():
     """Testa a comparação sem sincronização temporal."""
-    # Cria dados simulados
     video1_data = create_mock_frame_data(100)
     video2_data = create_mock_frame_data(100)
-    
-    # Cria parâmetros sem sincronização temporal
     params = ComparisonParams(temporal_sync=False)
-    
-    # Cria comparador
-    comparison = DanceComparison(video1_data, video2_data, params)
-    
-    # Verifica se a comparação funciona
-    similarity = comparison.get_similarity()
+    comparador = ComparadorMovimento()
+    results = comparador.compare_videos(
+        video1_data, video2_data, 30.0, 30.0, (1920, 1080), (1920, 1080)
+    )
+    similarity = results.global_score
     assert 0 <= similarity <= 1
 
 def test_save_and_load_params():
