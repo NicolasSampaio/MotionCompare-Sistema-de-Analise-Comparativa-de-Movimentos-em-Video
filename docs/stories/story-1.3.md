@@ -25,13 +25,13 @@ Como desenvolvedor, eu preciso implementar a extração de pontos-chave do corpo
 
 ## Tarefas Técnicas
 
-- [ ] Implementar integração com MediaPipe Pose
-- [ ] Criar sistema de processamento de frames
-- [ ] Desenvolver extração de landmarks
-- [ ] Implementar tratamento de erros
-- [ ] Criar sistema de logging
-- [ ] Desenvolver testes com diferentes cenários
-- [ ] Otimizar performance do processamento
+- [x] Implementar integração com MediaPipe Pose
+- [x] Criar sistema de processamento de frames
+- [x] Desenvolver extração de landmarks
+- [x] Implementar tratamento de erros
+- [x] Criar sistema de logging
+- [x] Desenvolver testes com diferentes cenários
+- [x] Otimizar performance do processamento
 
 ## Dependências
 
@@ -54,7 +54,7 @@ Como desenvolvedor, eu preciso implementar a extração de pontos-chave do corpo
 ## Status
 
 - [x] Planejado
-- [ ] Em Desenvolvimento
-- [ ] Em Teste
-- [ ] Concluído
+- [x] Em Desenvolvimento
+- [x] Em Teste
+- [x] Concluído
 - [ ] Cancelado
