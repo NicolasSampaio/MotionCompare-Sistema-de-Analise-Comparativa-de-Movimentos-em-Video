@@ -57,5 +57,5 @@ Como usuário, eu preciso poder carregar vídeos através da linha de comando, p
 - [x] Planejado
 - [x] Em Desenvolvimento
 - [x] Em Teste
-- [ ] Concluído
+- [x] Concluído
 - [ ] Cancelado
