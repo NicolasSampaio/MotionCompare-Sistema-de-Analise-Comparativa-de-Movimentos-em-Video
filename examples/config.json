@@ -1,0 +1,12 @@
+{
+  "metric": "dtw",
+  "tolerance": 0.15,
+  "landmark_weights": {
+    "shoulder": 0.8,
+    "hip": 0.7,
+    "knee": 0.6,
+    "ankle": 0.5
+  },
+  "temporal_sync": true,
+  "normalize": true
+}

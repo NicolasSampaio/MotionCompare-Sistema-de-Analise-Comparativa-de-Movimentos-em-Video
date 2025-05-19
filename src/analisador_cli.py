@@ -8,8 +8,10 @@ import logging
 from typing import List, Optional
 import cv2
 from tqdm import tqdm
+import json
 
 from .pose_estimation import PoseExtractor
+from .comparison_params import ComparisonParams, DistanceMetric
 
 # Configuração do logging
 logging.basicConfig(
@@ -64,6 +66,7 @@ Exemplos de uso:
   python analisador_cli.py -v video.mp4
   python analisador_cli.py -v video.mp4 -o output.mp4 -r 720p
   python analisador_cli.py -v video.mp4 -f 30 --verbose
+  python analisador_cli.py -v video.mp4 --config params.json
         """
     )
 
@@ -103,6 +106,55 @@ Exemplos de uso:
         help='Pula o processamento do vídeo e carrega os dados salvos'
     )
 
+    # Novos argumentos para parâmetros de comparação
+    parser.add_argument(
+        '--config',
+        help='Caminho para arquivo de configuração JSON com parâmetros de comparação'
+    )
+
+    parser.add_argument(
+        '--metric',
+        choices=['euclidean', 'dtw'],
+        help='Métrica de distância para comparação'
+    )
+
+    parser.add_argument(
+        '--tolerance',
+        type=float,
+        help='Tolerância de similaridade (0-1)'
+    )
+
+    parser.add_argument(
+        '--landmark-weights',
+        help='Pesos dos landmarks no formato JSON (ex: {"shoulder": 0.8, "hip": 0.6})'
+    )
+
+    parser.add_argument(
+        '--temporal-sync',
+        action='store_true',
+        help='Ativar sincronização temporal'
+    )
+
+    parser.add_argument(
+        '--no-temporal-sync',
+        action='store_false',
+        dest='temporal_sync',
+        help='Desativar sincronização temporal'
+    )
+
+    parser.add_argument(
+        '--normalize',
+        action='store_true',
+        help='Ativar normalização'
+    )
+
+    parser.add_argument(
+        '--no-normalize',
+        action='store_false',
+        dest='normalize',
+        help='Desativar normalização'
+    )
+
     parsed_args = parser.parse_args(args)
 
     # Validações
@@ -118,15 +170,68 @@ Exemplos de uso:
     if parsed_args.fps is not None and parsed_args.fps <= 0:
         parser.error("FPS deve ser um número positivo")
 
+    # Validação dos parâmetros de comparação
+    if parsed_args.config:
+        if not validate_file_path(parsed_args.config):
+            parser.error(f"Arquivo de configuração não encontrado: {parsed_args.config}")
+        try:
+            with open(parsed_args.config, 'r') as f:
+                json.load(f)
+        except json.JSONDecodeError:
+            parser.error(f"Arquivo de configuração inválido: {parsed_args.config}")
+
+    if parsed_args.tolerance is not None and not 0 <= parsed_args.tolerance <= 1:
+        parser.error("Tolerância deve estar entre 0 e 1")
+
+    if parsed_args.landmark_weights:
+        try:
+            weights = json.loads(parsed_args.landmark_weights)
+            if not isinstance(weights, dict):
+                parser.error("Pesos dos landmarks devem ser um objeto JSON")
+            for weight in weights.values():
+                if not isinstance(weight, (int, float)) or not 0 <= weight <= 1:
+                    parser.error("Pesos dos landmarks devem estar entre 0 e 1")
+        except json.JSONDecodeError:
+            parser.error("Formato inválido para pesos dos landmarks")
+
     # Configuração do nível de logging
     if parsed_args.verbose:
         logger.setLevel(logging.DEBUG)
 
     return parsed_args
 
+def get_comparison_params(args: argparse.Namespace) -> ComparisonParams:
+    """
+    Obtém os parâmetros de comparação a partir dos argumentos da linha de comando.
+    
+    Args:
+        args (argparse.Namespace): Argumentos processados
+        
+    Returns:
+        ComparisonParams: Parâmetros de comparação
+    """
+    if args.config:
+        return ComparisonParams.load_from_file(args.config)
+    
+    params = ComparisonParams()
+    
+    if args.metric:
+        params.metric = DistanceMetric(args.metric)
+    if args.tolerance is not None:
+        params.tolerance = args.tolerance
+    if args.landmark_weights:
+        params.landmark_weights = json.loads(args.landmark_weights)
+    if args.temporal_sync is not None:
+        params.temporal_sync = args.temporal_sync
+    if args.normalize is not None:
+        params.normalize = args.normalize
+    
+    return params
+
 def process_video(video_path: str, output_path: Optional[str] = None, 
                  resolution: str = '720p', fps: Optional[int] = None,
-                 skip_processing: bool = False) -> bool:
+                 skip_processing: bool = False,
+                 comparison_params: Optional[ComparisonParams] = None) -> bool:
     """
     Processa o vídeo e extrai os dados de pose.
     
@@ -136,13 +241,14 @@ def process_video(video_path: str, output_path: Optional[str] = None,
         resolution: Resolução de saída ('480p', '720p', '1080p')
         fps: FPS de processamento (opcional)
         skip_processing: Se True, pula o processamento e carrega os dados salvos
+        comparison_params: Parâmetros de comparação (opcional)
         
     Returns:
         bool: True se o processamento foi bem sucedido
     """
     try:
-        # Inicializa o extrator de pose
-        extractor = PoseExtractor()
+        # Inicializa o extrator de pose com os parâmetros de comparação
+        extractor = PoseExtractor(comparison_params=comparison_params)
         
         if skip_processing:
             logger.info("Carregando dados de pose salvos...")
@@ -231,12 +337,17 @@ def main():
         logger.info(f"Iniciando processamento do vídeo: {args.video}")
         logger.debug(f"Argumentos recebidos: {args}")
 
+        # Obtém os parâmetros de comparação
+        comparison_params = get_comparison_params(args)
+        logger.debug(f"Parâmetros de comparação: {comparison_params}")
+
         success = process_video(
             video_path=args.video,
             output_path=args.output,
             resolution=args.resolution,
             fps=args.fps,
-            skip_processing=args.skip_processing
+            skip_processing=args.skip_processing,
+            comparison_params=comparison_params
         )
 
         if success:

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 from .pose_storage import PoseStorage
 from .pose_models import PoseLandmark
+from .comparison_params import ComparisonParams
 
 # Configuração do logging
 logging.basicConfig(
@@ -19,13 +20,16 @@ logger = logging.getLogger(__name__)
 class PoseExtractor:
     """Classe responsável por extrair pontos-chave do corpo usando MediaPipe."""
     
-    def __init__(self, min_detection_confidence: float = 0.5, min_tracking_confidence: float = 0.5):
+    def __init__(self, min_detection_confidence: float = 0.5, 
+                 min_tracking_confidence: float = 0.5,
+                 comparison_params: Optional[ComparisonParams] = None):
         """
         Inicializa o extrator de pose.
         
         Args:
             min_detection_confidence: Confiança mínima para detecção (0.0 a 1.0)
             min_tracking_confidence: Confiança mínima para tracking (0.0 a 1.0)
+            comparison_params: Parâmetros de comparação (opcional)
         """
         if not 0.0 <= min_detection_confidence <= 1.0:
             raise ValueError("min_detection_confidence deve estar entre 0.0 e 1.0")
@@ -40,7 +44,77 @@ class PoseExtractor:
             min_tracking_confidence=min_tracking_confidence
         )
         self.storage = PoseStorage()
+        self.comparison_params = comparison_params or ComparisonParams()
         logger.info("PoseExtractor inicializado com sucesso")
+
+    def normalize_landmarks(self, landmarks: Dict[int, PoseLandmark]) -> Dict[int, PoseLandmark]:
+        """
+        Normaliza os landmarks se a normalização estiver ativada.
+        
+        Args:
+            landmarks: Dicionário com os landmarks
+            
+        Returns:
+            Dicionário com os landmarks normalizados
+        """
+        if not self.comparison_params.normalize:
+            return landmarks
+            
+        # Encontra os limites do corpo
+        x_coords = [lm.x for lm in landmarks.values()]
+        y_coords = [lm.y for lm in landmarks.values()]
+        z_coords = [lm.z for lm in landmarks.values()]
+        
+        min_x, max_x = min(x_coords), max(x_coords)
+        min_y, max_y = min(y_coords), max(y_coords)
+        min_z, max_z = min(z_coords), max(z_coords)
+        
+        # Calcula as escalas
+        scale_x = max_x - min_x if max_x > min_x else 1.0
+        scale_y = max_y - min_y if max_y > min_y else 1.0
+        scale_z = max_z - min_z if max_z > min_z else 1.0
+        
+        # Normaliza os landmarks
+        normalized = {}
+        for idx, landmark in landmarks.items():
+            normalized[idx] = PoseLandmark(
+                x=(landmark.x - min_x) / scale_x,
+                y=(landmark.y - min_y) / scale_y,
+                z=(landmark.z - min_z) / scale_z,
+                visibility=landmark.visibility
+            )
+        
+        return normalized
+
+    def apply_landmark_weights(self, landmarks: Dict[int, PoseLandmark]) -> Dict[int, PoseLandmark]:
+        """
+        Aplica os pesos aos landmarks se definidos.
+        
+        Args:
+            landmarks: Dicionário com os landmarks
+            
+        Returns:
+            Dicionário com os landmarks ponderados
+        """
+        if not self.comparison_params.landmark_weights:
+            return landmarks
+            
+        weighted = {}
+        for idx, landmark in landmarks.items():
+            # Obtém o nome do landmark (ex: "shoulder", "hip", etc.)
+            landmark_name = self.mp_pose.PoseLandmark(idx).name.lower()
+            
+            # Aplica o peso se definido, senão usa 1.0
+            weight = self.comparison_params.landmark_weights.get(landmark_name, 1.0)
+            
+            weighted[idx] = PoseLandmark(
+                x=landmark.x * weight,
+                y=landmark.y * weight,
+                z=landmark.z * weight,
+                visibility=landmark.visibility
+            )
+        
+        return weighted
 
     def process_frame(self, frame: np.ndarray) -> Optional[Dict[int, PoseLandmark]]:
         """
@@ -84,6 +158,10 @@ class PoseExtractor:
                     z=landmark.z,
                     visibility=landmark.visibility
                 )
+            
+            # Aplica as transformações configuradas
+            landmarks = self.normalize_landmarks(landmarks)
+            landmarks = self.apply_landmark_weights(landmarks)
             
             return landmarks
             

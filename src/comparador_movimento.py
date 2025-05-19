@@ -5,6 +5,9 @@ from dataclasses import dataclass
 from scipy.spatial.distance import euclidean
 from scipy.signal import resample
 from scipy.optimize import linear_sum_assignment
+import mediapipe as mp
+
+from .comparison_params import ComparisonParams, DistanceMetric
 
 # Configuração do logging
 logging.basicConfig(
@@ -28,25 +31,30 @@ class FrameData:
 class DanceComparison:
     """Classe principal para comparação de movimentos de dança."""
     
-    def __init__(self, video1_data: List[FrameData], video2_data: List[FrameData], normalize: bool = True):
+    def __init__(self, video1_data: List[FrameData], video2_data: List[FrameData], 
+                 comparison_params: Optional[ComparisonParams] = None):
         """
         Inicializa o comparador de dança.
         
         Args:
             video1_data: Lista de FrameData do primeiro vídeo
             video2_data: Lista de FrameData do segundo vídeo
-            normalize: Se True, normaliza os vídeos automaticamente
+            comparison_params: Parâmetros de comparação (opcional)
         """
         self.video1 = video1_data
         self.video2 = video2_data
-        if normalize:
+        self.comparison_params = comparison_params or ComparisonParams()
+        self.mp_pose = mp.solutions.pose
+        
+        if self.comparison_params.normalize:
             self._normalize_videos()
         logger.info("Inicializado comparador de dança com dois vídeos")
         
     def _normalize_videos(self) -> None:
         """Normaliza os vídeos para comparação."""
         # Normalização temporal
-        self._normalize_temporal()
+        if self.comparison_params.temporal_sync:
+            self._normalize_temporal()
         # Normalização espacial
         self._normalize_spatial()
         
@@ -99,8 +107,16 @@ class DanceComparison:
         
     def _frame_distance(self, frame1: FrameData, frame2: FrameData) -> float:
         """Calcula a distância entre dois frames."""
-        # Distância euclidiana ponderada pela confiança
-        weights = np.minimum(frame1.confidence, frame2.confidence)
+        # Aplica os pesos dos landmarks se definidos
+        weights = np.ones_like(frame1.confidence)
+        if self.comparison_params.landmark_weights:
+            for idx, landmark_name in enumerate(self.mp_pose.PoseLandmark):
+                weight = self.comparison_params.landmark_weights.get(landmark_name.name.lower(), 1.0)
+                weights[idx] = weight
+        
+        # Combina com os pesos de confiança
+        weights *= np.minimum(frame1.confidence, frame2.confidence)
+        
         return np.sum(weights * np.linalg.norm(
             frame1.landmarks - frame2.landmarks, axis=1
         ))
@@ -151,25 +167,21 @@ class DanceComparison:
         # Implementação do alinhamento dos vídeos
         pass
         
-    def compare(self, metric: str = 'euclidean', params: Optional[Dict] = None) -> Dict:
+    def compare(self) -> Dict:
         """
-        Compara os dois vídeos usando a métrica especificada.
+        Compara os dois vídeos usando os parâmetros configurados.
         
-        Args:
-            metric: Métrica de comparação ('euclidean' ou 'dtw')
-            params: Parâmetros adicionais para a métrica
-            
         Returns:
             Dicionário com resultados da comparação
         """
-        if metric == 'euclidean':
-            return self._compare_euclidean(params)
-        elif metric == 'dtw':
-            return self._compare_dtw(params)
+        if self.comparison_params.metric == DistanceMetric.EUCLIDEAN:
+            return self._compare_euclidean()
+        elif self.comparison_params.metric == DistanceMetric.DTW:
+            return self._compare_dtw()
         else:
-            raise ValueError(f"Métrica {metric} não suportada")
+            raise ValueError(f"Métrica {self.comparison_params.metric} não suportada")
             
-    def _compare_euclidean(self, params: Optional[Dict] = None) -> Dict:
+    def _compare_euclidean(self) -> Dict:
         """Compara os vídeos usando distância euclidiana."""
         frame_scores = []
         for frame1, frame2 in zip(self.video1, self.video2):
@@ -179,10 +191,11 @@ class DanceComparison:
         return {
             'global_score': np.mean(frame_scores),
             'frame_scores': frame_scores,
-            'metric': 'euclidean'
+            'metric': 'euclidean',
+            'similarity': 1.0 - min(1.0, np.mean(frame_scores) / self.comparison_params.tolerance)
         }
         
-    def _compare_dtw(self, params: Optional[Dict] = None) -> Dict:
+    def _compare_dtw(self) -> Dict:
         """Compara os vídeos usando DTW."""
         cost_matrix = self._compute_cost_matrix()
         path = self._compute_dtw_path(cost_matrix)
@@ -196,7 +209,8 @@ class DanceComparison:
             'global_score': np.mean(frame_scores),
             'frame_scores': frame_scores,
             'metric': 'dtw',
-            'alignment_path': path
+            'alignment_path': path,
+            'similarity': 1.0 - min(1.0, np.mean(frame_scores) / self.comparison_params.tolerance)
         }
         
     def get_global_score(self) -> float:
@@ -206,3 +220,7 @@ class DanceComparison:
     def get_frame_scores(self) -> List[float]:
         """Retorna os scores por frame."""
         return self.compare()['frame_scores']
+        
+    def get_similarity(self) -> float:
+        """Retorna o valor de similaridade normalizado (0-1)."""
+        return self.compare()['similarity']
