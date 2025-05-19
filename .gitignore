@@ -106,8 +106,10 @@ venv.bak/
 
 # Project specific
 reports/
-*.mp4
+
 
 docs/checklists/
 docs/tasks/
 /docs/templates
+
+*.mp4

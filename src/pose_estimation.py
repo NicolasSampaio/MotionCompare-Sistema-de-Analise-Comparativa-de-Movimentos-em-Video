@@ -129,6 +129,8 @@ class PoseExtractor:
             
             frame_landmarks = []
             frame_count = 0
+            last_progress_update = 0
+            update_interval = max(1, total_frames // 200)  # Atualiza a cada 0.5% do progresso
             
             while cap.isOpened():
                 ret, frame = cap.read()
@@ -140,8 +142,13 @@ class PoseExtractor:
                 frame_landmarks.append(landmarks)
                 
                 frame_count += 1
-                if progress_callback:
+                if progress_callback and (frame_count - last_progress_update >= update_interval):
                     progress_callback(frame_count, total_frames)
+                    last_progress_update = frame_count
+            
+            # Garante que o último progresso seja reportado
+            if progress_callback and frame_count > last_progress_update:
+                progress_callback(frame_count, total_frames)
             
             cap.release()
             logger.info(f"Processamento do vídeo concluído. Total de frames processados: {frame_count}")

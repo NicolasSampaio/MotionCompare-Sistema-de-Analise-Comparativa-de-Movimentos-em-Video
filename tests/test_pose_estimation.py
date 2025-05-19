@@ -109,18 +109,26 @@ def test_process_video():
     
     # Configura a barra de progresso
     pbar = tqdm(total=total_frames, desc="Processando frames", unit="frames", ncols=100, file=sys.stdout)
+    last_update = 0
     
     def progress_callback(frame_count: int, total_frames: int):
-        pbar.update(1)
-        if frame_count % 100 == 0:
+        nonlocal last_update
+        update_amount = frame_count - last_update
+        if update_amount > 0:
+            pbar.update(update_amount)
+            last_update = frame_count
+            
             elapsed_time = time.time() - start_time
             frames_per_second = frame_count / elapsed_time if elapsed_time > 0 else 0
             remaining_frames = total_frames - frame_count
             estimated_time = remaining_frames / frames_per_second if frames_per_second > 0 else 0
-            print(f"\nProgresso: {frame_count}/{total_frames} frames "
-                  f"({frame_count/total_frames*100:.1f}%) - "
-                  f"Velocidade: {frames_per_second:.1f} fps - "
-                  f"Tempo restante estimado: {estimated_time:.1f}s", flush=True)
+            
+            # Atualiza a descrição da barra de progresso com informações detalhadas
+            pbar.set_description(
+                f"Processando frames ({frame_count}/{total_frames} - {frame_count/total_frames*100:.1f}%) - "
+                f"Velocidade: {frames_per_second:.1f} fps - "
+                f"Tempo restante: {estimated_time:.1f}s"
+            )
     
     results = extractor.process_video(video_path, progress_callback=progress_callback)
     pbar.close()
