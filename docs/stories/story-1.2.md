@@ -25,13 +25,13 @@ Como usuário, eu preciso poder carregar vídeos através da linha de comando, p
 
 ## Tarefas Técnicas
 
-- [ ] Implementar parser de argumentos com argparse
-- [ ] Criar validação de formatos de vídeo suportados
-- [ ] Implementar validação de caminhos de arquivo
-- [ ] Desenvolver sistema de mensagens de erro
-- [ ] Criar documentação da CLI
-- [ ] Implementar testes unitários
-- [ ] Adicionar logging para debug
+- [x] Implementar parser de argumentos com argparse
+- [x] Criar validação de formatos de vídeo suportados
+- [x] Implementar validação de caminhos de arquivo
+- [x] Desenvolver sistema de mensagens de erro
+- [x] Criar documentação da CLI
+- [x] Implementar testes unitários
+- [x] Adicionar logging para debug
 
 ## Dependências
 
@@ -55,7 +55,7 @@ Como usuário, eu preciso poder carregar vídeos através da linha de comando, p
 ## Status
 
 - [x] Planejado
-- [ ] Em Desenvolvimento
-- [ ] Em Teste
-- [ ] Concluído
+- [x] Em Desenvolvimento
+- [x] Em Teste
+- [x] Concluído
 - [ ] Cancelado
