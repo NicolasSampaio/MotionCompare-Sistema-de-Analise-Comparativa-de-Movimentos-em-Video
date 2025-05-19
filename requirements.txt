@@ -1,0 +1,9 @@
+# Dependências principais
+mediapipe==0.10.21
+opencv-python==4.9.0.80
+numpy==1.26.4
+
+# Dependências de desenvolvimento
+pytest==8.0.2
+black==24.2.0
+flake8==7.0.0 
