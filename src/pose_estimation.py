@@ -6,6 +6,8 @@ import os
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 
+from .pose_storage import PoseStorage
+
 # Configuração do logging
 logging.basicConfig(
     level=logging.INFO,
@@ -44,6 +46,7 @@ class PoseExtractor:
             min_detection_confidence=min_detection_confidence,
             min_tracking_confidence=min_tracking_confidence
         )
+        self.storage = PoseStorage()
         logger.info("PoseExtractor inicializado com sucesso")
 
     def process_frame(self, frame: np.ndarray) -> Optional[Dict[int, PoseLandmark]]:
@@ -149,11 +152,42 @@ class PoseExtractor:
             
             cap.release()
             logger.info(f"Processamento do vídeo concluído. Total de frames processados: {frame_count}")
+            
+            # Salva os dados de pose
+            self.storage.save_pose_data(
+                video_path=video_path,
+                fps=fps,
+                resolution=(width, height),
+                total_frames=total_frames,
+                frame_landmarks=frame_landmarks
+            )
+            
             return frame_landmarks
             
         except Exception as e:
             logger.error(f"Erro ao processar vídeo: {str(e)}")
             return []
+
+    def load_pose_data(self, video_path: str) -> Optional[List[Optional[Dict[int, PoseLandmark]]]]:
+        """
+        Carrega os dados de pose de um vídeo.
+        
+        Args:
+            video_path: Caminho do vídeo
+            
+        Returns:
+            Lista de dicionários com os landmarks de cada frame ou None se os dados não forem encontrados
+        """
+        pose_data = self.storage.load_pose_data(video_path)
+        if pose_data is None:
+            return None
+            
+        # Converte os frames de volta para o formato original
+        frame_landmarks = [None] * pose_data.total_frames
+        for frame in pose_data.frames:
+            frame_landmarks[frame.frame_number] = frame.landmarks
+            
+        return frame_landmarks
 
     def __del__(self):
         """Libera recursos do MediaPipe."""
