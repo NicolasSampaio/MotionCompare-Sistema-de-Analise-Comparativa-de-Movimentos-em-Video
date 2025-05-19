@@ -48,8 +48,8 @@ Como desenvolvedor, eu preciso configurar um ambiente Python isolado e instalar 
 
 ## Status
 
-- [ ] Planejado
-- [ ] Em Desenvolvimento
-- [ ] Em Teste
+- [x] Planejado
+- [x] Em Desenvolvimento
+- [x] Em Teste
 - [x] Concluído
 - [ ] Cancelado

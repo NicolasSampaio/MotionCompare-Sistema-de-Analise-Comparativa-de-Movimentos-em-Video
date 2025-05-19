@@ -42,10 +42,13 @@ def validate_file_path(file_path: str) -> bool:
     """
     return os.path.isfile(file_path) and os.access(file_path, os.R_OK)
 
-def parse_arguments() -> argparse.Namespace:
+def parse_arguments(args: Optional[List[str]] = None) -> argparse.Namespace:
     """
     Configura e processa os argumentos da linha de comando.
     
+    Args:
+        args (Optional[List[str]]): Lista de argumentos da linha de comando
+        
     Returns:
         argparse.Namespace: Argumentos processados
     """
@@ -90,26 +93,26 @@ Exemplos de uso:
         help='Ativa modo verbose para mais informações de debug'
     )
 
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
 
     # Validações
-    if not validate_file_path(args.video):
-        parser.error(f"Arquivo não encontrado ou sem permissão de leitura: {args.video}")
+    if not validate_file_path(parsed_args.video):
+        parser.error(f"Arquivo não encontrado ou sem permissão de leitura: {parsed_args.video}")
 
-    if not validate_video_format(args.video):
+    if not validate_video_format(parsed_args.video):
         parser.error(f"Formato de vídeo não suportado. Formatos aceitos: {', '.join(SUPPORTED_FORMATS)}")
 
-    if args.output and not validate_video_format(args.output):
+    if parsed_args.output and not validate_video_format(parsed_args.output):
         parser.error(f"Formato de saída não suportado. Formatos aceitos: {', '.join(SUPPORTED_FORMATS)}")
 
-    if args.fps is not None and args.fps <= 0:
+    if parsed_args.fps is not None and parsed_args.fps <= 0:
         parser.error("FPS deve ser um número positivo")
 
     # Configuração do nível de logging
-    if args.verbose:
+    if parsed_args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    return args
+    return parsed_args
 
 def main():
     """

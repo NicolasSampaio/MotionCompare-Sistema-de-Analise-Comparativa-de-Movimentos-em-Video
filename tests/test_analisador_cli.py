@@ -27,26 +27,28 @@ def test_validate_file_path():
 
 def test_parse_arguments():
     """Testa o parsing de argumentos da CLI."""
-    # Teste com argumentos válidos
-    args = parse_arguments(['-v', 'test.mp4'])
-    assert args.video == 'test.mp4'
-    assert args.resolution == '720p'  # valor padrão
-    assert args.fps is None
-    assert args.verbose is False
+    # Criar um arquivo temporário para teste
+    with tempfile.NamedTemporaryFile(suffix='.mp4') as temp_file:
+        # Teste com argumentos válidos
+        args = parse_arguments(['-v', temp_file.name])
+        assert args.video == temp_file.name
+        assert args.resolution == '720p'  # valor padrão
+        assert args.fps is None
+        assert args.verbose is False
 
-    # Teste com todos os argumentos
-    args = parse_arguments([
-        '-v', 'test.mp4',
-        '-o', 'output.mp4',
-        '-r', '1080p',
-        '-f', '30',
-        '--verbose'
-    ])
-    assert args.video == 'test.mp4'
-    assert args.output == 'output.mp4'
-    assert args.resolution == '1080p'
-    assert args.fps == 30
-    assert args.verbose is True
+        # Teste com todos os argumentos
+        args = parse_arguments([
+            '-v', temp_file.name,
+            '-o', 'output.mp4',
+            '-r', '1080p',
+            '-f', '30',
+            '--verbose'
+        ])
+        assert args.video == temp_file.name
+        assert args.output == 'output.mp4'
+        assert args.resolution == '1080p'
+        assert args.fps == 30
+        assert args.verbose is True
 
 def test_parse_arguments_invalid():
     """Testa o parsing de argumentos inválidos."""
