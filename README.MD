@@ -115,3 +115,36 @@ tcc/
 ├── requirements.txt # Dependências do projeto
 └── README.md       # Este arquivo
 ```
+
+## Exemplo de Uso da API Interna de Resultados Brutos
+
+Abaixo um exemplo de como acessar, salvar e recuperar resultados brutos de comparação no sistema:
+
+```python
+from src.comparison_results import ComparisonResults
+from src.pose_storage import PoseStorage
+from src.results_cache import ResultsCache
+
+# Criando um resultado de comparação
+results = ComparisonResults(
+    global_score=0.9,
+    frame_scores=[0.8, 0.9, 1.0],
+    temporal_alignment={"offset": 0, "scale": 1.0},
+    landmark_details={"left_shoulder": {"score": 0.9}},
+    metadata={"video1": "video1.mp4", "video2": "video2.mp4"}
+)
+
+# Salvando resultados em disco
+pose_storage = PoseStorage("data/pose")
+pose_storage.save_comparison_results("video1.mp4", "video2.mp4", results)
+
+# Carregando resultados salvos
+dados = pose_storage.load_comparison_results("video1.mp4", "video2.mp4")
+print(dados.global_score)
+
+# Usando o sistema de cache
+cache = ResultsCache(cache_dir="cache")
+cache.set("comparacao_v1_v2", results)
+recuperado = cache.get("comparacao_v1_v2")
+print(recuperado.to_json())
+```

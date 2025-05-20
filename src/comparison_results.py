@@ -11,6 +11,31 @@ logger = logging.getLogger(__name__)
 class ComparisonResults:
     """
     Estrutura de dados para armazenar os resultados brutos da comparação de movimentos.
+
+    Campos principais:
+        - global_score (float): Score global de similaridade entre os vídeos.
+        - frame_scores (List[float]): Scores de similaridade por frame.
+        - temporal_alignment (dict): Detalhes da comparação temporal.
+        - landmark_details (dict): Informações detalhadas por landmark.
+        - metadata (dict): Metadados da análise (caminhos, datas, parâmetros, etc).
+        - Outros campos: informações sobre vídeos, resoluções, pesos, métricas gerais, etc.
+
+    Métodos principais:
+        - to_dict(): Serializa os resultados para dicionário Python.
+        - to_json(): Serializa os resultados para string JSON.
+        - from_dict(data): Cria uma instância a partir de um dicionário.
+        - from_json(json_str): Cria uma instância a partir de uma string JSON.
+        - validate(): Valida a integridade dos dados.
+        - log_results(): Registra os resultados no log do sistema.
+
+    Exemplo de uso:
+        >>> results = ComparisonResults(global_score=0.9, frame_scores=[0.8, 0.9], ...)
+        >>> results.validate()
+        True
+        >>> json_str = results.to_json()
+        >>> novo = ComparisonResults.from_json(json_str)
+        >>> novo.global_score
+        0.9
     """
     video1_path: str = ""
     video2_path: str = ""
