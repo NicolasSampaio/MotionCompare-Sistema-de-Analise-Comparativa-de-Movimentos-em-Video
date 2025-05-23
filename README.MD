@@ -283,6 +283,71 @@ plotter.plot_frame_comparison(frame_idx=1)
 plt.show()
 ```
 
+## Scripts Utilitários
+
+O projeto inclui scripts utilitários para facilitar a comparação de vídeos sem a necessidade de escrever código.
+
+### comparar_videos.py
+
+Este script realiza a comparação detalhada entre dois vídeos de dança, utilizando diretamente os componentes internos do sistema.
+
+**Propósito:**
+- Extrair poses de dois vídeos
+- Armazenar os dados de pose em disco para uso futuro
+- Comparar os movimentos entre os vídeos
+- Exibir métricas detalhadas de similaridade
+
+**Uso:**
+```bash
+python comparar_videos.py
+```
+
+**Parâmetros:**
+O script utiliza valores padrão para os caminhos dos vídeos (definidos no código). Para personalizar, edite as variáveis no início da função `main()`:
+- `video1_path`: Caminho para o primeiro vídeo
+- `video2_path`: Caminho para o segundo vídeo
+
+**Exemplo de personalização:**
+```python
+# Modifique estas linhas no script
+video1_path = "caminho/para/seu/video1.mp4"
+video2_path = "caminho/para/seu/video2.mp4"
+```
+
+### comparar_videos_simples.py
+
+Uma versão simplificada que utiliza a interface de alto nível `AnalisadorCLI` para comparar vídeos com menos código.
+
+**Propósito:**
+- Fornecer uma interface simplificada para comparação de vídeos
+- Utilizar a API de alto nível do sistema
+- Gerar relatórios em formato JSON
+
+**Uso:**
+```bash
+python comparar_videos_simples.py
+```
+
+**Parâmetros:**
+Assim como o script anterior, utiliza valores padrão que podem ser modificados editando o código:
+- `video1_path`: Caminho para o primeiro vídeo
+- `video2_path`: Caminho para o segundo vídeo
+- `output_path`: Caminho para salvar o relatório JSON (opcional)
+
+**Exemplo de personalização:**
+```python
+# Modifique estas linhas no script
+video1_path = "caminho/para/seu/video1.mp4"
+video2_path = "caminho/para/seu/video2.mp4"
+output_path = "caminho/para/relatorio.json"
+```
+
+**Diferenças entre os scripts:**
+- `comparar_videos.py`: Mais detalhado, com acesso direto aos componentes internos do sistema
+- `comparar_videos_simples.py`: Mais simples, utilizando a API de alto nível do sistema
+
+Ambos os scripts salvam os dados de pose extraídos para reutilização futura, evitando o reprocessamento dos mesmos vídeos.
+
 ## Contribuindo
 
 1. Siga os padrões definidos em [`docs/operational-guidelines.md`](docs/operational-guidelines.md) e [`docs/checklists/story-dod-checklist.md`](docs/checklists/story-dod-checklist.md).

@@ -23,31 +23,31 @@ logger = logging.getLogger(__name__)
 def main():
     """Exemplo de uso dos parâmetros de comparação."""
     # Caminhos dos vídeos
-    video1_path = "video1.mp4"
-    video2_path = "video2.mp4"
-    
+    video1_path = "videos_teste/esq.mp4"
+    video2_path = "videos_teste/dir.mp4"
+
     # Verifica se os vídeos existem
     if not os.path.exists(video1_path) or not os.path.exists(video2_path):
         logger.error("Vídeos não encontrados. Por favor, forneça os caminhos corretos.")
         return
-    
+
     # Inicializa o extrator de pose
     extractor = PoseExtractor()
-    
+
     # Processa os vídeos
     logger.info("Processando vídeo 1...")
     video1_data = extractor.process_video(video1_path)
-    
+
     logger.info("Processando vídeo 2...")
     video2_data = extractor.process_video(video2_path)
-    
+
     # Exemplo 1: Configuração padrão
     logger.info("\nExemplo 1: Configuração padrão")
     params1 = ComparisonParams()
     comparison1 = DanceComparison(video1_data, video2_data, params1)
     similarity1 = comparison1.get_similarity()
     logger.info(f"Similaridade: {similarity1:.2f}")
-    
+
     # Exemplo 2: Configuração para dança contemporânea
     logger.info("\nExemplo 2: Configuração para dança contemporânea")
     params2 = ComparisonParams(
@@ -65,7 +65,7 @@ def main():
     comparison2 = DanceComparison(video1_data, video2_data, params2)
     similarity2 = comparison2.get_similarity()
     logger.info(f"Similaridade: {similarity2:.2f}")
-    
+
     # Exemplo 3: Configuração para movimentos rápidos
     logger.info("\nExemplo 3: Configuração para movimentos rápidos")
     params3 = ComparisonParams(
@@ -83,7 +83,7 @@ def main():
     comparison3 = DanceComparison(video1_data, video2_data, params3)
     similarity3 = comparison3.get_similarity()
     logger.info(f"Similaridade: {similarity3:.2f}")
-    
+
     # Exemplo 4: Carregando configuração de arquivo
     logger.info("\nExemplo 4: Carregando configuração de arquivo")
     config_path = "examples/config.json"
@@ -96,4 +96,4 @@ def main():
         logger.warning(f"Arquivo de configuração não encontrado: {config_path}")
 
 if __name__ == "__main__":
-    main() 
+    main()
