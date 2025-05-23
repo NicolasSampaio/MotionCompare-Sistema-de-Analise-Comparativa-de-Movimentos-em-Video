@@ -41,3 +41,22 @@
 - [x] Testes implementados
 - [x] Documentação atualizada
 - [x] Exemplos criados
+
+## História 3.1: Geração de Relatório Textual de Análise
+
+### Arquivos Criados
+
+- `src/gerador_relatorio.py`: Implementação do gerador de relatório
+- `src/tests/test_gerador_relatorio.py`: Testes unitários para o gerador de relatório
+
+### Arquivos Modificados
+
+- `requirements.txt`: Adicionada dependência rich para formatação CLI
+- `docs/stories/story-3.1.md`: Atualizado status e progresso da história
+
+### Status
+
+- [x] Implementação concluída
+- [x] Testes implementados
+- [x] Documentação atualizada
+- [x] Dependências atualizadas

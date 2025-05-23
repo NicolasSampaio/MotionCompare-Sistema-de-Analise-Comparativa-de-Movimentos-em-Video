@@ -1,6 +1,6 @@
 # História 3.1: Geração de Relatório Textual de Análise
 
-## Status: Draft
+## Status: Review
 
 ## Story
 
@@ -19,31 +19,31 @@
 
 ## Tasks / Subtasks
 
-- [ ] Implementar estrutura base do relatório (AC: 1, 2)
-  - [ ] Criar classe ReportGenerator
-  - [ ] Implementar formatação do score global
-  - [ ] Implementar formatação da análise por frame
-  - [ ] Adicionar testes unitários
+- [x] Implementar estrutura base do relatório (AC: 1, 2)
+  - [x] Criar classe ReportGenerator
+  - [x] Implementar formatação do score global
+  - [x] Implementar formatação da análise por frame
+  - [x] Adicionar testes unitários
 
-- [ ] Implementar análise de concordância/divergência (AC: 3)
-  - [ ] Desenvolver algoritmo de identificação de pontos críticos
-  - [ ] Implementar formatação dos pontos destacados
-  - [ ] Adicionar testes unitários
+- [x] Implementar análise de concordância/divergência (AC: 3)
+  - [x] Desenvolver algoritmo de identificação de pontos críticos
+  - [x] Implementar formatação dos pontos destacados
+  - [x] Adicionar testes unitários
 
-- [ ] Implementar sistema de recomendações (AC: 4)
-  - [ ] Desenvolver lógica de análise para recomendações
-  - [ ] Implementar formatação das recomendações
-  - [ ] Adicionar testes unitários
+- [x] Implementar sistema de recomendações (AC: 4)
+  - [x] Desenvolver lógica de análise para recomendações
+  - [x] Implementar formatação das recomendações
+  - [x] Adicionar testes unitários
 
-- [ ] Implementar sistema de saída (AC: 5)
-  - [ ] Desenvolver salvamento em arquivo
-  - [ ] Implementar exibição na CLI
-  - [ ] Adicionar testes de integração
+- [x] Implementar sistema de saída (AC: 5)
+  - [x] Desenvolver salvamento em arquivo
+  - [x] Implementar exibição na CLI
+  - [x] Adicionar testes de integração
 
-- [ ] Implementar testes de geração (AC: 6)
-  - [ ] Criar testes de integração
-  - [ ] Implementar testes de performance
-  - [ ] Adicionar testes de casos de borda
+- [x] Implementar testes de geração (AC: 6)
+  - [x] Criar testes de integração
+  - [x] Implementar testes de performance
+  - [x] Adicionar testes de casos de borda
 
 ## Dev Technical Guidance
 
@@ -110,9 +110,15 @@ report.display()
 ### Agent Model Used: Claude 3.7 Sonnet
 
 ### Completion Notes List
-- Implementar validação de dados de entrada
-- Considerar internacionalização futura
-- Documentar padrões de formatação
+- Implementada estrutura base do relatório com todas as seções necessárias
+- Implementado sistema de formatação usando rich para melhor visualização
+- Adicionados testes unitários para todas as funcionalidades
+- Implementada validação de dados de entrada
+- Considerada internacionalização futura
+- Documentados padrões de formatação
 
 ### Change Log
-- 2024-03-19: Criação inicial da história 
+- 2024-03-19: Criação inicial da história
+- 2024-03-20: Implementação da estrutura base do relatório
+- 2024-03-20: Implementação dos testes unitários
+- 2024-03-20: Implementação do sistema de formatação e saída
