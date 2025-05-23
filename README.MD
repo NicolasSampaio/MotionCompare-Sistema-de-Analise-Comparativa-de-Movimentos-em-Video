@@ -1,14 +1,14 @@
-# Projeto TCC
+# Projeto TCC - Análise de Movimentos em Dança
 
 ## Visão Geral
 
-Sistema de análise de movimentos em vídeo, com foco em comparação de performances de dança usando MediaPipe, OpenCV e ferramentas de ciência de dados em Python.
+Sistema de análise de movimentos em vídeo, com foco em comparação de performances de dança usando MediaPipe, OpenCV e ferramentas de ciência de dados em Python. O projeto permite extrair, analisar e comparar movimentos de dança em vídeos, gerando relatórios detalhados e visualizações.
 
 ## Configuração do Ambiente de Desenvolvimento
 
 ### Pré-requisitos
 
-- Python 3.9 ou superior (recomendado: 3.11.x)
+- Python 3.9 ou superior (recomendado: 3.11.x ou 3.12.x)
 - pip (gerenciador de pacotes Python)
 - Git (opcional, para controle de versão)
 
@@ -37,6 +37,11 @@ Sistema de análise de movimentos em vídeo, com foco em comparação de perform
 3. Instale as dependências:
    ```bash
    pip install -r requirements.txt
+   ```
+
+   Ou use o script de configuração no Windows:
+   ```bash
+   .\setup.bat
    ```
 
 ### Verificação da Instalação
@@ -110,16 +115,26 @@ python -m src.analisador_cli --command compare video1.mp4 video2.mp4 --config pa
 ```
 tcc/
 ├── docs/           # Documentação do projeto
+├── examples/       # Exemplos de uso da API
 ├── src/            # Código fonte principal
 │   ├── analisador_cli.py
 │   ├── comparador_movimento.py
 │   ├── pose_estimation.py
 │   ├── pose_storage.py
+│   ├── pose_models.py
+│   ├── comparison_params.py
 │   ├── comparison_results.py
 │   ├── results_cache.py
-│   └── ...
+│   ├── carregamento_dados.py
+│   ├── gerador_relatorio.py
+│   ├── utils.py
+│   └── report/     # Módulo de relatórios e visualizações
+│       ├── exporters/  # Exportadores (JSON, CSV)
+│       └── visualizer/ # Visualizadores gráficos
 ├── tests/          # Testes automatizados
 │   └── videos_teste/
+├── data/           # Dados de pose e resultados
+│   └── pose/
 ├── reports/        # Relatórios e resultados
 ├── requirements.txt # Dependências do projeto
 └── README.md       # Este arquivo
@@ -127,7 +142,46 @@ tcc/
 
 Para detalhes completos, consulte [`docs/project-structure.md`](docs/project-structure.md).
 
-## Exemplo de Uso da API Interna
+## Exemplos de Uso da API
+
+### Comparação de Vídeos
+
+```python
+from src.pose_estimation import PoseExtractor
+from src.comparison_params import ComparisonParams, DistanceMetric
+from src.comparador_movimento import DanceComparison
+
+# Inicializa o extrator de pose
+extractor = PoseExtractor()
+
+# Processa os vídeos
+video1_data = extractor.process_video("video1.mp4")
+video2_data = extractor.process_video("video2.mp4")
+
+# Configuração para dança contemporânea
+params = ComparisonParams(
+    metric=DistanceMetric.DTW,
+    tolerance=0.2,
+    landmark_weights={
+        "shoulder": 0.9,
+        "hip": 0.8,
+        "knee": 0.7,
+        "ankle": 0.6
+    },
+    temporal_sync=True,
+    normalize=True
+)
+
+# Realiza a comparação
+comparison = DanceComparison(video1_data, video2_data, params)
+similarity = comparison.get_similarity()
+print(f"Similaridade: {similarity:.2f}")
+
+# Carregando configuração de arquivo
+params_from_file = ComparisonParams.load_from_file("config.json")
+```
+
+### Armazenamento e Cache
 
 ```python
 from src.comparison_results import ComparisonResults
@@ -158,9 +212,80 @@ recuperado = cache.get("comparacao_v1_v2")
 print(recuperado.to_json())
 ```
 
+### Exportação de Relatórios
+
+```python
+from src.report.exporters import JSONExporter, CSVExporter
+
+# Dados de análise
+analysis_data = {
+    "results": [
+        {
+            "id": 1,
+            "name": "Movimento 1",
+            "score": 0.95,
+            "details": {"accuracy": 0.98, "smoothness": 0.92}
+        },
+        {
+            "id": 2,
+            "name": "Movimento 2",
+            "score": 0.85,
+            "details": {"accuracy": 0.87, "smoothness": 0.83}
+        }
+    ],
+    "metadata": {
+        "version": "1.0",
+        "timestamp": "2024-03-19",
+        "analysis_type": "comparison"
+    }
+}
+
+# Exporta para JSON
+json_exporter = JSONExporter(analysis_data)
+json_exporter.export("output/analysis_results.json")
+
+# Exporta para CSV
+csv_exporter = CSVExporter(analysis_data)
+csv_exporter.export("output/analysis_results.csv")
+```
+
+### Visualização de Resultados
+
+```python
+import matplotlib.pyplot as plt
+from src.report.visualizer.plots import SimilarityPlotter
+
+# Dados de comparação
+comparison_data = {
+    "global_score": 0.85,
+    "frames": [
+        {"frame_id": 1, "score": 0.9, "landmarks": {"left_shoulder": 0.95, "right_shoulder": 0.85}},
+        {"frame_id": 2, "score": 0.8, "landmarks": {"left_shoulder": 0.85, "right_shoulder": 0.75}},
+        {"frame_id": 3, "score": 0.85, "landmarks": {"left_shoulder": 0.90, "right_shoulder": 0.80}}
+    ],
+    "metadata": {
+        "video1": "danca1.mp4",
+        "video2": "danca2.mp4",
+        "date": "2024-05-15"
+    }
+}
+
+# Cria o visualizador
+plotter = SimilarityPlotter(comparison_data)
+
+# Plota o gráfico de similaridade ao longo do tempo
+plotter.plot_similarity()
+
+# Plota a comparação de um frame específico
+plotter.plot_frame_comparison(frame_idx=1)
+
+# Mostra os gráficos
+plt.show()
+```
+
 ## Contribuindo
 
-1. Siga os padrões definidos em [`docs/operational-guidelines.md`](docs/operational-guidelines.md) e [`docs/checklists/story-dod-checklist.txt`](docs/checklists/story-dod-checklist.txt).
+1. Siga os padrões definidos em [`docs/operational-guidelines.md`](docs/operational-guidelines.md) e [`docs/checklists/story-dod-checklist.md`](docs/checklists/story-dod-checklist.md).
 2. Use PEP8, type hints, docstrings e mantenha o código testável.
 3. Antes de abrir um PR, rode todos os testes e verifique se não há erros de lint (`flake8`) ou formatação (`black`).
 4. Documente mudanças relevantes e siga o checklist de Definition of Done (DoD).
@@ -172,8 +297,24 @@ print(recuperado.to_json())
 - [Modelos de Dados](docs/data-models.md)
 - [Diretrizes Operacionais](docs/operational-guidelines.md)
 - [Estrutura do Projeto](docs/project-structure.md)
-- [Checklist de DoD](docs/checklists/story-dod-checklist.txt)
+- [Parâmetros de Comparação](docs/parametros_comparacao.md)
+- [Arquitetura do Sistema](docs/Arquitetura_AnaliseDanca.md)
+- [PRD - Product Requirements Document](docs/PRD_AnaliseDanca.md)
+- [Checklist de DoD](docs/checklists/story-dod-checklist.md)
 - [Tech Stack](docs/tech-stack.md)
+
+## Epics e Stories
+
+O projeto está organizado em epics e stories para facilitar o desenvolvimento:
+
+- [Epic 1: Extração de Pose](docs/epic-1.md)
+- [Epic 2: Comparação de Movimentos](docs/epic-2.md)
+- [Epic 3: Visualização e Relatórios](docs/epic-3.md)
+- [Epic 4: Interface de Usuário](docs/epic-4.md)
+- [Epic 5: Otimização e Performance](docs/epic-5.md)
+- [Epic 6: Integração e Implantação](docs/epic-6.md)
+
+Para ver todas as stories, consulte o [índice de stories](docs/stories/stories-index.md).
 
 ---
 
