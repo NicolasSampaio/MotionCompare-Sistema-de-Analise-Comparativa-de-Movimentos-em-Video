@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 def main():
     """Script para comparar dois vídeos de dança."""
     # Caminhos dos vídeos
-    video1_path = "videos_teste/sapatoA.mp4"
-    video2_path = "videos_teste/sapatoB.mp4"
+    video1_path = "videos_teste/jennieA.webm"
+    video2_path = "videos_teste/jennieB.webm"
     
     # Verifica se os vídeos existem
     if not os.path.exists(video1_path) or not os.path.exists(video2_path):

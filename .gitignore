@@ -113,4 +113,6 @@ docs/tasks/
 /docs/templates
 
 *.mp4
+*.webm
+*.jpg
 /bmad-agent
