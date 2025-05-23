@@ -1,82 +1,43 @@
 # Projeto TCC
 
+## Visão Geral
+
+Sistema de análise de movimentos em vídeo, com foco em comparação de performances de dança usando MediaPipe, OpenCV e ferramentas de ciência de dados em Python.
+
 ## Configuração do Ambiente de Desenvolvimento
 
 ### Pré-requisitos
 
-- Python 3.8 ou superior
+- Python 3.9 ou superior (recomendado: 3.11.x)
 - pip (gerenciador de pacotes Python)
 - Git (opcional, para controle de versão)
 
 ### Instalação
 
-1. Clone o repositório (se estiver usando Git):
+1. Clone o repositório:
 
    ```bash
    git clone [URL_DO_REPOSITÓRIO]
    cd tcc
    ```
 
-2. Execute o script de setup:
+2. Crie e ative o ambiente virtual:
 
-   - No Windows:
-     ```bash
-     setup.bat
-     ```
-   - No Linux/macOS:
+   - **Windows:**
      ```bash
      python -m venv venv
-     source venv/bin/activate
-     pip install -r requirements.txt
+     .\venv\Scripts\activate
      ```
-
-3. Ative o ambiente virtual:
-   - No Windows:
+   - **Linux/macOS:**
      ```bash
-     venv\Scripts\activate
-     ```
-   - No Linux/macOS:
-     ```bash
+     python3 -m venv venv
      source venv/bin/activate
      ```
 
-### Uso da CLI
-
-A ferramenta de análise de vídeo pode ser utilizada através da linha de comando. Aqui estão os principais comandos e opções disponíveis:
-
-#### Comandos Básicos
-
-```bash
-# Processar um vídeo com configurações padrão
-python src/analisador_cli.py -v video.mp4
-
-# Especificar arquivo de saída
-python src/analisador_cli.py -v video.mp4 -o output.mp4
-
-# Definir resolução de saída
-python src/analisador_cli.py -v video.mp4 -r 1080p
-
-# Definir FPS de processamento
-python src/analisador_cli.py -v video.mp4 -f 30
-
-# Ativar modo verbose para mais informações
-python src/analisador_cli.py -v video.mp4 --verbose
-```
-
-#### Opções Disponíveis
-
-- `-v, --video`: Caminho do arquivo de vídeo a ser processado (obrigatório)
-- `-o, --output`: Caminho do arquivo de saída (opcional)
-- `-r, --resolution`: Resolução de saída do vídeo (padrão: 720p)
-  - Opções: 480p, 720p, 1080p
-- `-f, --fps`: FPS de processamento (opcional)
-- `--verbose`: Ativa modo verbose para mais informações de debug
-
-#### Formatos Suportados
-
-- MP4 (.mp4)
-- AVI (.avi)
-- MOV (.mov)
+3. Instale as dependências:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ### Verificação da Instalação
 
@@ -86,39 +47,87 @@ Para verificar se todas as dependências foram instaladas corretamente, execute:
 pytest tests/test_imports.py
 ```
 
-### Solução de Problemas
+Para rodar todos os testes automatizados:
 
-#### Problemas comuns e soluções:
+```bash
+pytest tests/
+```
 
-1. **Erro ao instalar MediaPipe**:
+## Uso da CLI
 
-   - Certifique-se de ter o Python 3.8 ou superior
-   - Atualize o pip: `python -m pip install --upgrade pip`
+A ferramenta principal pode ser utilizada via linha de comando. Veja exemplos de comandos:
 
-2. **Erro ao instalar OpenCV**:
+```bash
+# Processar um vídeo
+python -m src.analisador_cli -v video.mp4 --command process
 
-   - No Windows: Instale o Visual C++ Build Tools
-   - No Linux: Instale as dependências de desenvolvimento: `sudo apt-get install python3-dev`
+# Comparar dois vídeos
+python -m src.analisador_cli --command compare video1.mp4 video2.mp4
 
-3. **Erro de permissão**:
-   - No Linux/macOS: Use `sudo` para comandos que requerem privilégios de administrador
-   - No Windows: Execute o PowerShell como administrador
+# Especificar arquivo de saída
+python -m src.analisador_cli -v video.mp4 -o output.mp4 --command process
 
-### Estrutura do Projeto
+# Definir resolução de saída
+python -m src.analisador_cli -v video.mp4 -r 1080p --command process
+
+# Definir FPS de processamento
+python -m src.analisador_cli -v video.mp4 -f 30 --command process
+
+# Ativar modo verbose
+python -m src.analisador_cli -v video.mp4 --verbose --command process
+
+# Usar arquivo de configuração de parâmetros
+python -m src.analisador_cli --command compare video1.mp4 video2.mp4 --config params.json
+```
+
+#### Opções Disponíveis
+
+- `-v, --video`: Caminho do arquivo de vídeo a ser processado (obrigatório para process)
+- `-o, --output`: Caminho do arquivo de saída (opcional)
+- `-r, --resolution`: Resolução de saída do vídeo (padrão: 720p)
+  - Opções: 480p, 720p, 1080p
+- `-f, --fps`: FPS de processamento (opcional)
+- `--verbose`: Ativa modo verbose para mais informações de debug
+- `--skip-processing`: Pula o processamento do vídeo e carrega dados salvos
+- `--config`: Caminho para arquivo JSON de parâmetros de comparação
+- `--metric`: Métrica de distância para comparação (`euclidean`, `dtw`)
+- `--tolerance`: Tolerância de similaridade (0-1)
+- `--landmark-weights`: Pesos dos landmarks em JSON (ex: '{"shoulder": 0.8, "hip": 0.6}')
+- `--temporal-sync`/`--no-temporal-sync`: Ativa/desativa sincronização temporal
+- `--normalize`/`--no-normalize`: Ativa/desativa normalização
+- `--storage-dir`: Diretório para armazenar dados de pose (padrão: data/pose)
+- `--command`: `process` ou `compare` (obrigatório)
+- `video1`, `video2`: Caminhos dos vídeos para comparação (obrigatório para compare)
+
+#### Formatos Suportados
+
+- MP4 (.mp4)
+- AVI (.avi)
+- MOV (.mov)
+
+## Estrutura do Projeto
 
 ```
 tcc/
 ├── docs/           # Documentação do projeto
-├── src/            # Código fonte
+├── src/            # Código fonte principal
+│   ├── analisador_cli.py
+│   ├── comparador_movimento.py
+│   ├── pose_estimation.py
+│   ├── pose_storage.py
+│   ├── comparison_results.py
+│   ├── results_cache.py
+│   └── ...
 ├── tests/          # Testes automatizados
+│   └── videos_teste/
 ├── reports/        # Relatórios e resultados
 ├── requirements.txt # Dependências do projeto
 └── README.md       # Este arquivo
 ```
 
-## Exemplo de Uso da API Interna de Resultados Brutos
+Para detalhes completos, consulte [`docs/project-structure.md`](docs/project-structure.md).
 
-Abaixo um exemplo de como acessar, salvar e recuperar resultados brutos de comparação no sistema:
+## Exemplo de Uso da API Interna
 
 ```python
 from src.comparison_results import ComparisonResults
@@ -148,3 +157,24 @@ cache.set("comparacao_v1_v2", results)
 recuperado = cache.get("comparacao_v1_v2")
 print(recuperado.to_json())
 ```
+
+## Contribuindo
+
+1. Siga os padrões definidos em [`docs/operational-guidelines.md`](docs/operational-guidelines.md) e [`docs/checklists/story-dod-checklist.txt`](docs/checklists/story-dod-checklist.txt).
+2. Use PEP8, type hints, docstrings e mantenha o código testável.
+3. Antes de abrir um PR, rode todos os testes e verifique se não há erros de lint (`flake8`) ou formatação (`black`).
+4. Documente mudanças relevantes e siga o checklist de Definition of Done (DoD).
+5. Consulte a documentação técnica e de API em [`docs/`](docs/).
+
+## Documentação Adicional
+
+- [Referência de API](docs/api-reference.md)
+- [Modelos de Dados](docs/data-models.md)
+- [Diretrizes Operacionais](docs/operational-guidelines.md)
+- [Estrutura do Projeto](docs/project-structure.md)
+- [Checklist de DoD](docs/checklists/story-dod-checklist.txt)
+- [Tech Stack](docs/tech-stack.md)
+
+---
+
+Em caso de dúvidas, consulte a documentação ou abra uma issue.
