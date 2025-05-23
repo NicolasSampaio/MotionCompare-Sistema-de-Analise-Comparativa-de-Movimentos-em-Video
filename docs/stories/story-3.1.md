@@ -1,6 +1,6 @@
 # História 3.1: Geração de Relatório Textual de Análise
 
-## Status: Review
+## Status: Concluída
 
 ## Story
 
@@ -122,3 +122,6 @@ report.display()
 - 2024-03-20: Implementação da estrutura base do relatório
 - 2024-03-20: Implementação dos testes unitários
 - 2024-03-20: Implementação do sistema de formatação e saída
+
+### Aprovação do Usuário
+- Revisão aprovada pelo usuário em 2024-06-07.

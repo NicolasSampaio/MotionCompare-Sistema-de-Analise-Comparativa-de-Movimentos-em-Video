@@ -1,6 +1,6 @@
 # História 3.2: Exportação dos Resultados em Diferentes Formatos
 
-## Status: Draft
+## Status: Review
 
 ## Story
 
@@ -18,32 +18,32 @@
 
 ## Tasks / Subtasks
 
-- [ ] Implementar exportador JSON (AC: 1)
-  - [ ] Criar classe JSONExporter
-  - [ ] Implementar serialização dos resultados
-  - [ ] Adicionar testes unitários
-  - [ ] Documentar formato JSON
+- [x] Implementar exportador JSON (AC: 1)
+  - [x] Criar classe JSONExporter
+  - [x] Implementar serialização dos resultados
+  - [x] Adicionar testes unitários
+  - [x] Documentar formato JSON
 
-- [ ] Implementar exportador CSV (AC: 2)
-  - [ ] Criar classe CSVExporter
-  - [ ] Implementar conversão dos resultados
-  - [ ] Adicionar testes unitários
-  - [ ] Documentar formato CSV
+- [x] Implementar exportador CSV (AC: 2)
+  - [x] Criar classe CSVExporter
+  - [x] Implementar conversão dos resultados
+  - [x] Adicionar testes unitários
+  - [x] Documentar formato CSV
 
-- [ ] Implementar sistema de validação (AC: 3)
-  - [ ] Criar validadores para cada formato
-  - [ ] Implementar verificação de integridade
-  - [ ] Adicionar testes de validação
+- [x] Implementar sistema de validação (AC: 3)
+  - [x] Criar validadores para cada formato
+  - [x] Implementar verificação de integridade
+  - [x] Adicionar testes de validação
 
-- [ ] Criar documentação e exemplos (AC: 4)
-  - [ ] Documentar formatos de saída
-  - [ ] Criar exemplos de uso
-  - [ ] Adicionar exemplos de dados
+- [x] Criar documentação e exemplos (AC: 4)
+  - [x] Documentar formatos de saída
+  - [x] Criar exemplos de uso
+  - [x] Adicionar exemplos de dados
 
-- [ ] Implementar testes de exportação (AC: 5)
-  - [ ] Criar testes de integração
-  - [ ] Implementar testes de performance
-  - [ ] Adicionar testes de casos de borda
+- [x] Implementar testes de exportação (AC: 5)
+  - [x] Criar testes de integração
+  - [x] Implementar testes de performance
+  - [x] Adicionar testes de casos de borda
 
 ## Dev Technical Guidance
 
@@ -120,4 +120,5 @@ csv_exporter.export("analysis_results.csv")
 - Documentar limites de tamanho de arquivo
 
 ### Change Log
-- 2024-03-19: Criação inicial da história 
+- 2024-03-19: Criação inicial da história
+- 2024-03-19: Implementação completa dos exportadores e testes
