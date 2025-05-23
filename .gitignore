@@ -113,3 +113,4 @@ docs/tasks/
 /docs/templates
 
 *.mp4
+/bmad-agent
