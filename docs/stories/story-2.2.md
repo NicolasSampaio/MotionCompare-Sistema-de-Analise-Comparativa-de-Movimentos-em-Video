@@ -94,4 +94,8 @@ class DanceComparison:
 - [x] Logging implementado e testado
 - [x] Código otimizado e limpo
 
-## Status: Concluído
+## Status: Concluída
+
+**Data de Conclusão:** 2024-03-19
+**Responsável:** Equipe de Desenvolvimento
+**Observações:** Algoritmo central de comparação implementado com sucesso, considerando tanto aspectos temporais quanto espaciais dos movimentos.

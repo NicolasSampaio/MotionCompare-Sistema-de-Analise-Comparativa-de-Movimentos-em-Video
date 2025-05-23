@@ -94,4 +94,8 @@ class ComparisonParams:
 - [x] Interface CLI testada
 - [x] Validação de parâmetros implementada
 
-### Status: Concluído
+### Status: Concluída
+
+**Data de Conclusão:** 2024-03-19
+**Responsável:** Equipe de Desenvolvimento
+**Observações:** Sistema de parametrização implementado com sucesso, permitindo ajuste fino da análise de similaridade.

@@ -17,12 +17,12 @@ Este arquivo indexa todas as Estórias de Usuário definidas para o projeto "Sis
 
 - **Objetivo:** Desenvolver o algoritmo principal que recebe as sequências de pontos-chave de dois vídeos (processados pelo Épico 1), realiza a comparação dos movimentos considerando dinâmica temporal e posicionamento estático, e implementa a capacidade de parametrizar a precisão desta análise.
 
-| ID  | Título da Estória                                          | Status  | Dependências | Link para Arquivo |
-| :-- | :--------------------------------------------------------- | :------ | :----------- | :---------------- |
-| 2.1 | Carregamento dos Dados de Pose para Dois Vídeos            | A Fazer | 1.4          | `./story-2.1.md`  |
-| 2.2 | Desenvolvimento do Algoritmo Central de Comparação         | A Fazer | 2.1          | `./story-2.2.md`  |
-| 2.3 | Implementação da Parametrização da Análise de Similaridade | A Fazer | 2.2          | `./story-2.3.md`  |
-| 2.4 | Disponibilização Interna dos Resultados Brutos             | A Fazer | 2.2          | `./story-2.4.md`  |
+| ID  | Título da Estória                                          | Status    | Dependências | Link para Arquivo |
+| :-- | :--------------------------------------------------------- | :-------- | :----------- | :---------------- |
+| 2.1 | Carregamento dos Dados de Pose para Dois Vídeos            | Concluída | 1.4          | `./story-2.1.md`  |
+| 2.2 | Desenvolvimento do Algoritmo Central de Comparação         | Concluída | 2.1          | `./story-2.2.md`  |
+| 2.3 | Implementação da Parametrização da Análise de Similaridade | Concluída | 2.2          | `./story-2.3.md`  |
+| 2.4 | Disponibilização Interna dos Resultados Brutos             | Concluída | 2.2          | `./story-2.4.md`  |
 
 ## Épico 3: Geração e Apresentação de Resultados da Análise
 
