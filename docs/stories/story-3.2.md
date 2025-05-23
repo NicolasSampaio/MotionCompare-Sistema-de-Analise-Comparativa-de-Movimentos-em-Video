@@ -1,6 +1,6 @@
 # História 3.2: Exportação dos Resultados em Diferentes Formatos
 
-## Status: Review
+## Status: Aprovada
 
 ## Story
 
@@ -122,3 +122,4 @@ csv_exporter.export("analysis_results.csv")
 ### Change Log
 - 2024-03-19: Criação inicial da história
 - 2024-03-19: Implementação completa dos exportadores e testes
+- 2024-03-19: Revisão aprovada
