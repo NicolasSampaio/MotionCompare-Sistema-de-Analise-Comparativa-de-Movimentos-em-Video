@@ -1,4 +1,4 @@
-# Projeto TCC - Análise de Movimentos em Dança
+# Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo
 
 ## Visão Geral
 

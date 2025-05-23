@@ -1,14 +1,14 @@
 Absolutamente\! Chegou a hora de materializar todo esse planejamento.
 
-Aqui está o seu **Documento de Arquitetura v0.1 (MVP para Demo)** para o projeto "Sistema de Análise Comparativa de Movimentos de Dança por Vídeo".
+Aqui está o seu **Documento de Arquitetura v0.1 (MVP para Demo)** para o "Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo".
 
 ---
 
-# Sistema de Análise Comparativa de Movimentos de Dança por Vídeo - Documento de Arquitetura v0.1 (MVP para Demo)
+# Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo - Documento de Arquitetura v0.1 (MVP para Demo)
 
 ## 1\. Introdução / Preâmbulo
 
-Este documento descreve a arquitetura técnica para o MVP (Produto Mínimo Viável) do TCC "Sistema de Análise Comparativa de Movimentos de Dança por Vídeo". O objetivo principal deste MVP é fornecer uma ferramenta de linha de comando (CLI) funcional capaz de carregar dados de pose de dois vídeos (pré-processados para extrair landmarks com MediaPipe), comparar os movimentos de dança e gerar um relatório textual simples indicando a similaridade. A arquitetura visa simplicidade e rapidez de implementação para atender à necessidade de uma demonstração funcional em 19 de maio de 2025. O sistema será desenvolvido em Python.
+Este documento descreve a arquitetura técnica para o MVP (Produto Mínimo Viável) do "Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo". O objetivo principal deste MVP é fornecer uma ferramenta de linha de comando (CLI) funcional capaz de carregar dados de pose de dois vídeos (pré-processados para extrair landmarks com MediaPipe), comparar os movimentos de dança e gerar um relatório textual simples indicando a similaridade. A arquitetura visa simplicidade e rapidez de implementação para atender à necessidade de uma demonstração funcional em 19 de maio de 2025. O sistema será desenvolvido em Python.
 
 ## 2\. Sumário Técnico
 
@@ -16,7 +16,7 @@ A arquitetura proposta para o MVP é uma aplicação Python CLI modular. O siste
 
 ## 3\. Visão Geral de Alto Nível
 
-A arquitetura para o MVP do "Sistema de Análise Comparativa de Movimentos de Dança por Vídeo" será uma **aplicação Python modular executada via linha de comando (CLI)**. Ela seguirá um padrão de **pipeline de processamento de dados**, onde os dados de vídeo (na forma de arquivos de landmarks pré-extraídos) passam por estágios sequenciais de carregamento, comparação e geração de relatório.
+A arquitetura para o MVP do "Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo" será uma **aplicação Python modular executada via linha de comando (CLI)**. Ela seguirá um padrão de **pipeline de processamento de dados**, onde os dados de vídeo (na forma de arquivos de landmarks pré-extraídos) passam por estágios sequenciais de carregamento, comparação e geração de relatório.
 
 O código-fonte será organizado em um **único repositório Git**.
 

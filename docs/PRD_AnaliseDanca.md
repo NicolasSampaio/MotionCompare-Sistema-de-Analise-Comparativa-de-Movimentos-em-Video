@@ -1,8 +1,8 @@
-# Sistema de Análise Comparativa de Movimentos de Dança por Vídeo - Product Requirements Document (PRD) v1.0
+# Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo - Product Requirements Document (PRD) v1.0
 
 ## 1. Meta, Objetivo e Contexto
 
-**Nome do Projeto:** Sistema de Análise Comparativa de Movimentos de Dança por Vídeo
+**Nome do Projeto:** Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo
 
 **Introdução / Declaração do Problema (Contexto):**
 Sou estudante de Bacharelado em Sistemas de Informação e pretendo desenvolver meu Trabalho de Conclusão de Curso (TCC). O objetivo é elaborar um trabalho que seja capaz de receber 2 vídeos e que compare se eles realizaram o mesmo movimento (por exemplo, analisar se um segundo vídeo de uma pessoa dançando uma música reproduz os movimentos do primeiro vídeo). Este projeto é uma exploração de técnicas de visão computacional aplicadas a um domínio criativo. A relevância acadêmica específica para Sistemas de Informação será posteriormente detalhada no TCC com apoio da orientação.
@@ -57,10 +57,10 @@ Transformar o sistema em um avaliador de movimentos de dança capaz de pontuar p
 * **Linguagem e Biblioteca Principal:**
     * A linguagem de programação principal para o desenvolvimento do TCC será **Python**.
     * Para a funcionalidade de estimativa de pose no MVP (Produto Mínimo Viável), a biblioteca prioritária é o **MediaPipe**.
-* **Arquitetura de Repositório e Organização do Código:** 
+* **Arquitetura de Repositório e Organização do Código:**
     * O código-fonte do projeto será mantido em um **único repositório Git**.
     * A estrutura interna específica dos scripts e módulos Python (organização de pastas, etc.) ainda não foi definida e poderá ser elaborada conforme o desenvolvimento avança ou com o auxílio do Arquiteto, se necessário.
-* **Requisitos de Teste e Validação:** 
+* **Requisitos de Teste e Validação:**
     * A validação principal do funcionamento do sistema durante o desenvolvimento do TCC será realizada através de **testes manuais**, utilizando diferentes pares de vídeos para análise.
     * Não está previsto o desenvolvimento de scripts de testes automatizados (como testes unitários) para o escopo inicial do MVP do TCC.
 
@@ -244,14 +244,14 @@ Esta seção serve como um lembrete para futuras evoluções do projeto e não r
 
 **Para: Arquiteto (Fred)**
 **De: Product Manager (John)**
-**Projeto:** Sistema de Análise Comparativa de Movimentos de Dança por Vídeo (TCC)
+**Projeto:** Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo
 **Data:** 19 de maio de 2025
 
 **Assunto: Solicitação de Design de Arquitetura Técnica para MVP**
 
 Prezado Arquiteto,
 
-Este Documento de Requisitos do Produto (PRD) detalha o escopo e os requisitos para o MVP do TCC "Sistema de Análise Comparativa de Movimentos de Dança por Vídeo". O objetivo principal do MVP é criar uma ferramenta via linha de comando (CLI) capaz de receber dois vídeos, extrair dados de pose usando Python e MediaPipe, comparar os movimentos e gerar um relatório de similaridade.
+Este Documento de Requisitos do Produto (PRD) detalha o escopo e os requisitos para o MVP do "Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo". O objetivo principal do MVP é criar uma ferramenta via linha de comando (CLI) capaz de receber dois vídeos, extrair dados de pose usando Python e MediaPipe, comparar os movimentos e gerar um relatório de similaridade.
 
 **Pontos Chave para o Design da Arquitetura do MVP:**
 

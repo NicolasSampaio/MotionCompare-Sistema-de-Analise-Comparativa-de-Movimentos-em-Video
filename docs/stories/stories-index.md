@@ -1,6 +1,6 @@
 # Índice de Estórias do Projeto
 
-Este arquivo indexa todas as Estórias de Usuário definidas para o projeto "Sistema de Análise Comparativa de Movimentos de Dança por Vídeo".
+Este arquivo indexa todas as Estórias de Usuário definidas para o "Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo".
 
 ## Épico 1: Configuração do Ambiente e Processamento de Vídeo Base
 

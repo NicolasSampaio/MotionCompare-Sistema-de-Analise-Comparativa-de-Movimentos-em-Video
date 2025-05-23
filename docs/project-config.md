@@ -1,8 +1,8 @@
-# Configuração do Projeto: Sistema de Análise Comparativa de Movimentos de Dança por Vídeo
+# Configuração do Projeto: Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo
 
 ## Nome do Projeto
 
-Sistema de Análise Comparativa de Movimentos de Dança por Vídeo
+Projeto TCC - MotionCompare: Sistema de Análise Comparativa de Movimentos em Vídeo
 
 ## Versão Atual
 

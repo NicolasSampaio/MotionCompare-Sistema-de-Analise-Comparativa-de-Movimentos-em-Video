@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 def main():
     """Script simples para comparar dois vídeos de dança usando o AnalisadorCLI."""
     # Caminhos dos vídeos
-    video1_path = "videos_teste/esq.mp4"
-    video2_path = "videos_teste/dir.mp4"
+    video1_path = "videos_teste/sapatoA.mp4"
+    video2_path = "videos_teste/sapatoB.mp4"
     
     # Verifica se os vídeos existem
     if not os.path.exists(video1_path) or not os.path.exists(video2_path):
