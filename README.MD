@@ -17,7 +17,7 @@ Sistema de análise de movimentos em vídeo, com foco em comparação de perform
 1. Clone o repositório:
 
    ```bash
-   git clone [URL_DO_REPOSITÓRIO]
+   git clone [https://github.com/NicolasSampaio/MotionCompare-Sistema-de-Analise-Comparativa-de-Movimentos-em-Video]
    cd tcc
    ```
 
